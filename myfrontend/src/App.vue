@@ -3,12 +3,7 @@
     <nav class="navbar is-danger" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="#">
-          <!-- <span class="icon-text"> -->
             <span><h2 class="title is-4 has-text-white">DessertBlog</h2></span>
-            <!-- <span class="icon">
-              <i class="fa-solid fa-cheese-swiss"></i>
-            </span> -->
-          <!-- </span> -->
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
