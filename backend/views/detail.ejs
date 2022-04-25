@@ -1,0 +1,65 @@
+<%- include('header') -%>
+
+<body class="has-background-light">
+    <div class="container is-widescreen">
+        <% if (error) { %>
+            <section class="section">
+            <div class="container is-widescreen">
+                <div class="notification is-danger">
+                  <%= error.code + ': ' + error.sqlMessage %>
+                </div>
+            </div>
+            </section>
+        <% } else { %>  
+        <section class="hero">
+          <div class="hero-body">
+            <p class="title"><%= posts.title %></p>
+          </div>
+        </section>
+        <section class="section" id="app">
+            <div class="content">
+                <div class="card has-background-white">
+                    <div class="card-image pt-5">
+                        <div class="columns is-centered">
+                                <div class="column is-half">
+                                    <figure class="image ">
+                                        <img src="<%= posts.img %>" alt="Placeholder image">
+                                    </figure>
+                                </div>
+                        </div>
+                        
+                    </div>
+                    <div class="card-content">
+                        <div class="content">
+                            <%= posts.description %>
+                        </div>
+                        <div class="content">
+                            <p class="is-size-5"><b>ส่วนผสม (Ingredient)</b></p>
+                            <ul>
+                                <% for (ingredient of ingredients) { %>
+                                <li><%= ingredient.ingredient %></li>
+                                <% } %>
+                              </ul>
+                        </div>
+                        <div class="content">
+                            <p class="is-size-5"><b>วิธีทำ (Cooking Method)</b></p>
+                            <ol type="1">
+                                <% for (method of methods) { %>
+                                <li><%= method.cooking_method %></li>
+                                <% } %>
+                            </ol>
+                        </div>
+                        
+                    </div>
+           
+                    <footer class="card-footer">
+                        <a class="card-footer-item" href="/">To Home Page</a>
+                    </footer>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+    </div>
+</body>
+</html>

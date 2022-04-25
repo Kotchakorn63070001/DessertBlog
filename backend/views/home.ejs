@@ -1,0 +1,85 @@
+<%- include('header') -%>
+
+<body class="has-background-light">
+    <div class="container is-widescreen">
+      <!-- <section class="hero">
+        <div class="hero-body">
+          <p class="title">My Stories</p>
+        </div>
+      </section> -->
+      <section class="section" id="app">
+        <div class="content">
+          <form method="GET" action="/home">
+               <div class="columns">
+                 <div class="column is-4 is-offset-3">
+                   <input class="input is-rounded" type="text" name="search" placeholder="ค้นหาเมนู" value="">
+                 </div>
+                 <div class="column is-2">
+                   <input class="button is-link is-rounded" type="submit" value="Search">
+                 </div>
+               </div>
+          </form>
+        </div>
+      </section>
+
+    <div class="columns">
+      <% for (let post of posts) { %>
+      <div class="column is-3">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="<%= post.img %>" alt="Placeholder image">
+            </figure>
+          </div>
+          <div class="card-content">
+            <!-- <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="title is-4">John Smith</p>
+                <p class="subtitle is-6">@johnsmith</p>
+              </div>
+            </div> -->
+        
+            <div class="content">
+              <p class="title is-3"><%= post.title %></p>
+              <p class="subtitle is-6">
+                <%= post.description %>
+              </p>
+              
+            </div>
+            <form method="POST" action="<%= `/posts/addlike/${post.post_id}` %>" id="form<%= post.post_id %>">
+              <button class="button is-small is-danger is-light" onclick="document.getElementById('form<%= post.post_id %>').submit();">
+                <span class="icon-text">
+                    <span class="icon is-medium">
+                      <i class="fa-solid fa-heart"></i>
+                    </span>
+                    <span><%= post.num_like %></span>
+                </span>
+              </button>
+              <button class="button is-small is-info is-light">
+                <span class="icon-text">
+                  <span class="icon is-medium">
+                    <i class="fa-solid fa-eye"></i>
+                  </span>
+                  <span><%= post.num_view %></span>
+                </span>
+              </button>
+              <a class="button is-small is-primary is-light" href="<%= `/posts/${post.post_id}/` %>">
+                <span>Read More</span>
+              </a>
+            </form>
+
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+    </div>
+
+  </div>
+</body>
+</html>
