@@ -4,16 +4,19 @@ const path = require("path")
 const pool = require("../config");
 const fs = require("fs");
 
-var storage = multer.diskStorage({
-    destination: function (req, file, callback){
-        callback(null, './static/uploads')
-    },
-    filename: function (req, file, callback){
-        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
-
-const upload = multer({ storage: storage })
+// SET STORAGE
+const storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, "./static/uploads");
+  },
+  filename: function (req, file, callback) {
+    callback(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+const upload = multer({ storage: storage });
 
 router = express.Router();
 
@@ -24,19 +27,62 @@ router.get('/create', async function(req, res, next){
     // res.send('Hello World!')
 })
 
-router.post('/create', upload.single('mainImage'), async function(req, res, next){
-    const title = req.body.title
-    const description = req.body.description
-    const file = req.file
+router.post('/create', upload.single("mainImage"), async function(req, res, next){
+    const title = req.body.title;
+    console.log(title)
+    const description = req.body.description;
+    const file = req.file;
+    const postTypeId = req.body.typeDessert;
+    
+    let ingreArray = [];
+    let methodArray = [];
 
     const conn = await pool.getConnection()
     await conn.beginTransaction()
 
     try{
+
+      // req.files.forEach((file, index) => {
+      //   let path = [title, file.path.substring(6), description, 1, 1];
+      //   pathArray.push(path);
+      // });
+      // console.log('path : ',path)
+      // console.log('pathArray : ',pathArray)
+
         const [rows, fields] = await conn.query(
             'INSERT INTO post(title, date, img, description, user_id, post_type_id) VALUES(?, CURRENT_TIMESTAMP, ?, ? ,?, ?)',
-            [title, file.path.substring(6), description, 1, 1]
+            [title, file.path.substring(6), description, 1, postTypeId]
         )
+        let postId = rows.insertId;
+
+        const [rows1, fields1] = await conn.query(
+          'INSERT INTO content(post_id) VALUES(?)',
+          [postId]
+        )
+        let contentId = rows1.insertId;
+        console.log('content_id = ', contentId)
+
+        req.body.ingredient.forEach((item) => {
+          let ingre = [contentId, item];
+          ingreArray.push(ingre);
+        });
+        // console.log('Ingredient Array :', ingreArray)
+
+        req.body.methodCook.forEach((item) => {
+          let method = [contentId, item]
+          methodArray.push(method)
+        })
+
+        await conn.query(
+          "INSERT INTO content_ingredient(content_id, ingredient) VALUES ?",
+          [ingreArray]
+        );
+
+        await conn.query(
+          "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES ?",
+          [methodArray]
+        );
+
         await conn.commit()
 
     } catch (err){

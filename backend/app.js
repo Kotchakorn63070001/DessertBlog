@@ -6,9 +6,8 @@ const bodyParser = require('body-parser')
 const app = express()
 app.use(cors())
 
-// Setup static path
-app.use(express.static(path.join(__dirname, 'static')))
-
+// Statics
+app.use(express.static('static'))
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 

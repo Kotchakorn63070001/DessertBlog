@@ -107,27 +107,6 @@
             fileName.textContent = fileInput.files[0].name;
           }
         }
-
-
-        // create variables
-        const divList = document.querySelector('.listIngredient');
-        const addIngre = document.querySelector('#addIngre');
-        const addBtn = document.querySelector('#addBtn');
-
-       
-
-        addBtn.addEventListener('click', () => {
-            if (addIngre.value === '') {
-            alert('Enter the list name please!!!');
-          } else {
-            const ul = divList.querySelector('ul');
-            const li = document.createElement('li');
-            li.innerHTML = addIngre.value;
-            addIngre.value = '';
-            ul.appendChild(li);
-            
-          }
-        })
        
     </script>
 </body>

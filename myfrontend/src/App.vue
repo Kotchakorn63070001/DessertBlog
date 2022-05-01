@@ -2,9 +2,10 @@
   <div id="app">
     <nav class="navbar is-danger" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="#">
+        <a class="navbar-item" href="/">
             <span><h2 class="title is-4 has-text-white">DessertBlog</h2></span>
         </a>
+        
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
           <span aria-hidden="true"></span>
@@ -16,7 +17,7 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-end">
       
-      <a class="navbar-item">
+      <a class="navbar-item" href="/">
         <span class="icon-text">
           <span class="icon">
             <i class="fa-solid fa-house-chimney-window"></i>
@@ -25,13 +26,15 @@
         </span>
       </a>
 
-      <a class="navbar-item">
-        <span class="icon-text">
-          <span class="icon">
-            <i class="fa-solid fa-pen"></i>
+      <a class="navbar-item" >
+        <router-link to="/create" class="has-text-white">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fa-solid fa-pen"></i>
+            </span>
+            <span>Create Post</span>
           </span>
-          <span>Create Post</span>
-        </span>
+        </router-link>
       </a>
 
       <div class="navbar-item has-dropdown is-hoverable">
@@ -68,7 +71,6 @@
     <router-view :key="$route.fullPath" />
   </div>
 </template>
-
 
 
 

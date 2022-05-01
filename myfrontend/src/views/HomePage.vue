@@ -1,6 +1,6 @@
 <template>
       <div class="container is-widescreen">
-        <section class="section" id="app">
+        <section class="section">
            <div class="content">
             <form method="GET" action="/home">
                  <div class="columns">
@@ -25,29 +25,25 @@
               </div>
               <div class="card-content">
                 <div class="content">
-                  <p class="title is-3">{{ post.title }}</p>
+                  <p class="title is-3">{{ post.title }} </p>
                   <p class="subtitle is-6">
                     {{ shortContent(post.description) }}
                   </p>
 
                 </div>
-                <div>
-                  <button class="button is-small is-danger is-light" @click="addLike(post.post_id)">
-                    <span class="icon-text">
-                        <span class="icon is-medium">
-                          <i class="fa-solid fa-heart"></i>
-                        </span>
-                        <span>{{ post.num_like }}</span>
-                    </span>
-                  </button>
-                  <button class="button is-small is-info is-light">
-                    <span class="icon-text">
+                <div class="buttons">
+                  <a class="button is-small is-danger is-light" @click="addLike(post.post_id)">
+                      <span class="icon">
+                        <i class="fa-solid fa-heart"></i>
+                      </span>
+                      <span>{{ post.num_like }}</span>
+                  </a>
+                  <a class="button is-small is-info is-light">
                       <span class="icon is-medium">
                         <i class="fa-solid fa-eye"></i>
                       </span>
                       <span>{{ post.num_view }}</span>
-                    </span>
-                  </button>
+                  </a>
                   <a class="button is-small is-primary is-light" href="<%= `/posts/${post.post_id}/` %>">
                     <span>Read More</span>
                   </a>
