@@ -123,9 +123,9 @@ router.put("/posts/addlike/:postId", async function (req, res, next) {
         console.log("finally add like post");
         conn.release();
     }
-  });
+});
   
-  router.get("/posts/:id", function (req, res, next) {
+router.get("/posts/:id", function (req, res, next) {
     const promise1 = pool.query("SELECT * FROM post JOIN content USING (post_id) WHERE post_id=?", [
       req.params.id,
     ]);
@@ -157,8 +157,102 @@ router.put("/posts/addlike/:postId", async function (req, res, next) {
         // })
       })
       .catch((err) => {
-        return next(err);
+        return res.status(500).json(err);
       });
-  });
+});
+
+
+// Edit Post
+router.put("/posts/:id", async function (req, res) {
+  const conn = await pool.getConnection()
+  await conn.beginTransaction();
+
+  try {
+    const file = req.file;
+
+    if (file) {
+      await conn.query(
+        "UPDATE images SET file_path=? WHERE id=?",
+        [file.path, req.params.id])
+    }
+
+    await conn.query('UPDATE blogs SET title=?,content=?, pinned=?, blogs.like=?, create_by_id=? WHERE id=?', [req.body.title, req.body.content, req.body.pinned, req.body.like, null, req.params.id])
+    conn.commit()
+    res.json({ message: "Update Blog id " + req.params.id + " Complete" })
+  } catch (error) {
+    await conn.rollback();
+    return next(error)
+  } finally {
+    console.log('finally')
+    conn.release();
+  }
+});
+
+
+//  Delete Post
+router.delete("/posts/:postId", async function (req, res, next) {
+  // Your code here
+  const conn = await pool.getConnection();
+  // Begin transaction
+  await conn.beginTransaction();
+
+  try {
+    // Check that there is no comments
+    const [
+      rows1,
+      fields1,
+    ] = await conn.query(
+      "SELECT COUNT(*) FROM `comments` WHERE `blog_id` = ?",
+      [req.params.blogId]
+    );
+    console.log(rows1);
+
+    if (rows1[0]["COUNT(*)"] > 0) {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete blogs with comments" });
+    }
+
+    //Delete files from the upload folder
+    const [
+      images,
+      imageFields,
+    ] = await conn.query(
+      "SELECT `file_path` FROM `images` WHERE `blog_id` = ?",
+      [req.params.blogId]
+    );
+    const appDir = path.dirname(require.main.filename); // Get app root directory
+    console.log(appDir)
+    images.forEach((e) => {
+      const p = path.join(appDir, 'static', e.file_path);
+      fs.unlinkSync(p);
+    });
+
+    // Delete images
+    await conn.query("DELETE FROM `images` WHERE `blog_id` = ?", [
+      req.params.blogId,
+    ]);
+    // Delete the selected blog
+    const [
+      rows2,
+      fields2,
+    ] = await conn.query("DELETE FROM `blogs` WHERE `id` = ?", [
+      req.params.blogId,
+    ]);
+
+    if (rows2.affectedRows === 1) {
+      await conn.commit();
+      res.status(204).send();
+    } else {
+      throw "Cannot delete the selected blog";
+    }
+  } catch (err) {
+    console.log(err)
+    await conn.rollback();
+    return res.status(500).json(err);
+  } finally {
+    conn.release();
+  }
+});
 
 exports.router = router;

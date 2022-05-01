@@ -2,27 +2,55 @@
       <div class="container is-widescreen">
         <section class="section">
            <div class="content">
-            <form method="GET" action="/home">
                  <div class="columns">
                    <div class="column is-4 is-offset-3">
-                     <input class="input is-rounded" type="text" name="search" placeholder="ค้นหาเมนู" value="">
+                     <input class="input is-rounded" type="text" placeholder="ค้นหาเมนู" v-model="search">
                    </div>
                    <div class="column is-2">
-                     <input class="button is-link is-rounded" type="submit" value="Search">
+                     <button class="button is-link is-rounded" @click="getPosts">Search</button>
                    </div>
                  </div>
-            </form>
           </div>
         </section>
 
         <div class="columns is-multiline">
           <div class="column is-3" v-for="post in posts" :key="post.id">
-            <div class="card">
+            <div class="card" style="height: 100%;">
+
+              
+
               <div class="card-image">
                 <figure class="image is-4by3">
                   <img :src="imagePath(post.img)" alt="Placeholder image">
                 </figure>
               </div>
+
+              <div style="position: absolute; top: 0.3em; right: 0.3em;">
+                  <div class="dropdown is-right is-hoverable">
+                    <div class="dropdown-trigger">
+                      <button class="button is-small is-link is-light is-rounded" aria-haspopup="true" aria-controls="dropdown-menu3" style="padding-left: 1em; padding-right: 1em;">
+                        <span class="icon is-medium">
+                          <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
+                      <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
+                        <a href="#" class="dropdown-item" @click="editPost(post.post_id)">
+                          <span>Edit</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                          <span>Delete</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                          <span>Report</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
               <div class="card-content">
                 <div class="content">
                   <p class="title is-3">{{ post.title }} </p>
@@ -31,6 +59,7 @@
                   </p>
 
                 </div>
+                
                 <div class="buttons">
                   <a class="button is-small is-danger is-light" @click="addLike(post.post_id)">
                       <span class="icon">
@@ -44,10 +73,19 @@
                       </span>
                       <span>{{ post.num_view }}</span>
                   </a>
-                  <a class="button is-small is-primary is-light" href="<%= `/posts/${post.post_id}/` %>">
-                    <span>Read More</span>
+                  
+                  <a class="button is-small is-primary is-light">
+                    <router-link :to="`/posts/${post.post_id}`">
+                      <span>Read More</span>
+                    </router-link>
                   </a>
+
+
+                
                 </div>
+
+
+
 
                
               </div>
@@ -65,19 +103,33 @@ export default {
       return {
         search: '',
         posts: [],
+        showEditModal : false,
+
       }
     },
     created() {
-      axios.get("http://localhost:3000/")
-        .then((response) => {
-          this.posts = response.data;
-          console.log(this.posts)
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+       this.getPosts();
+       
+       
     },
+    // mounted(){
+    //   this.getPosts();
+    // },
     methods: {
+      getPosts(){
+        axios
+          .get('http://localhost:3000/', {
+            params: {
+              search: this.search,
+            }
+          })
+          .then((response) => {
+            this.posts = response.data;
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      },
       imagePath(file_path) {
         if (file_path){
           return 'http://localhost:3000/' + file_path
@@ -102,7 +154,8 @@ export default {
           .catch((err) => {
             console.log(err);
           });
-      }
+      },
+      
     }
   }
 </script>

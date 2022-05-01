@@ -54,9 +54,6 @@
           <a class="navbar-item">
             Log out
           </a>
-          <a class="navbar-item">
-            Contact
-          </a>
           <hr class="navbar-divider">
           <a class="navbar-item">
             Report an issue

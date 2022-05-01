@@ -4,7 +4,7 @@
             <div class="columns">
                 <div class="column is-half is-offset-one-quarter">
                     <!-- <form action="/create/" method="POST" enctype="multipart/form-data"> -->
-                        <div class="box">
+                        <div class="box has-background-link-light	">
                             <div class="field">
                                 <label class="label">ชื่อเมนู</label>
                                 <div class="control">
@@ -19,17 +19,28 @@
                                 </div>
                             </div>
 
+                            <div class="columns">
+                                <div class="column is-8">
+                                    
+                                </div>
+                            </div>
                             <div class="field">
                                 <label class="label">ประเภทขนม</label>
-                                <div class="select">
+                                <div class="select is-info">
                                     <select v-model="typeDessert">
+                                        <option value="0" disabled="disabled">--- เลือกประเภทขนม ---</option>
                                         <option value="1">Bakery</option>
                                         <option value="2">Thai Dessert</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" @change="selectMainImage($event)">
+                            <div class="field">
+                                <label class="label">ภาพขนมของคุณ</label>
+                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" @change="selectMainImage($event)">
+                            </div>
+
+                            
                             <!-- <div class="field">
                                 <div id="file-js" class="file is-info is-centered has-name is-boxed  is-fullwidth">
                                     <label class="file-label">
@@ -55,7 +66,7 @@
                                 <label class="label">ส่วนผสม</label>
                                 <div class="content">
                                     <ul>
-                                        <li v-for="item in ingredients" :key="item.ingredient">
+                                        <li v-for="item in ingredients" :key="item">
                                             {{ item }}
                                         </li>
                                     </ul>
@@ -91,7 +102,7 @@
                                 <label class="label">วิธีทำ</label>
                                 <div class="content">
                                     <ul>
-                                        <li v-for="item in methodCook" :key="item.ingredient">
+                                        <li v-for="item in methodCook" :key="item">
                                             {{ item }}
                                         </li>
                                     </ul>
