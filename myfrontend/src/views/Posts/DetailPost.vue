@@ -37,22 +37,14 @@
                                 <li v-for="method in methods" :key="method.cooking_method_no">{{ method.cooking_method }}</li>
                             </ol>
                         </div>
-                       
-                     
-                            <div class="columns  is-gapless is-multiline">
-                                <div class="column " v-for="image in images" :key="image.image_no">
-                                   
-                                    <figure class="image"  >
-                                        <img :src="imagePath(image.image)" style="width: 100%; border-radius: 5%" alt="Placeholder image">
-                                    </figure>
-                           
-                                </div>
+
+                        <div class="columns  is-gapless is-multiline">
+                            <div class="column " v-for="image in images" :key="image.image_no">
+                                <figure class="image"  >
+                                    <img :src="imagePath(image.image)" style="width: 100%; border-radius: 5%" alt="Placeholder image">
+                                   </figure>
                             </div>
-   
-                   
-                            
-                      
-                        
+                        </div>
                     </div>
            
                     <footer class="card-footer">

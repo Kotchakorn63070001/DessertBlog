@@ -20,6 +20,11 @@ const routes = [
     name: 'detail-post',
     component: () => import('../views/Posts/DetailPost.vue')
   },
+  {
+    path: '/posts/update/:id',
+    name: 'edit-post',
+    component: () => import('../views/Posts/EditPost.vue')
+  }
 ]
 
 const router = new VueRouter({

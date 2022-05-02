@@ -2,9 +2,12 @@
     <div class="container is-widescreen">
         <div class="m-4">
             <div class="columns">
-                <div class="column is-three-fifths is-offset-one-fifth">
+                <div class="column is-2">
+
+                </div>
+                <div class="column is-8">
                     <!-- <form action="/create/" method="POST" enctype="multipart/form-data"> -->
-                        <div class="box has-background-link-light	">
+                        <div class="box 	">
                             <div class="field">
                                 <label class="label">ชื่อเมนู</label>
                                 <div class="control">
@@ -60,25 +63,32 @@
                             </div> -->
 
                             <!-- ส่วนผสม -->
-                            <div class="box">
+                            <!-- <div class="box"> -->
                                 <label class="label">ส่วนผสม</label>
                                 <div class="content">
-                                    <ul>
-                                        <li v-for="item in ingredients" :key="item">
-                                            {{ item }}
-                                        </li>
-                                    </ul>
+                                    <!-- <ul> -->
+                                        <div class="box pt-2 pb-2 has-background-link-light" v-for="(item, index) in ingredients" :key="item">
+                                            <span>{{ item }}</span>
+                                            <div class="is-pulled-right">
+                                                <button class="button is-small is-danger is-rounded" style="padding-left: 1em; padding-right: 1em;" @click="deleteIngreItem(index)">
+                                                    <span class="icon is-small">
+                                                        <i class="fa-solid fa-minus"></i>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <!-- </ul> -->
                                 </div>
                                 
                                 <div class="columns">
-                                    <div class="column is-8">
+                                    <div class="column is-9">
                                         <div class="field">
                                             <div class="control">
                                                 <input class="input is-info" id="addIngre" type="text" v-model="newIngre" placeholder="ส่วนผสมของคุณ">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="column is-4">
+                                    <div class="column is-3">
                                         <div class="field">
                                             <div class="control">
                                                 <button class="button is-link is-light" id="addBtn" @click="addIngre()">
@@ -93,28 +103,35 @@
                                           </div>      
                                     </div>
                                 </div>
-                            </div>
+                            <!-- </div> -->
 
                             <!-- วิธีทำ -->
-                            <div class="box">
+                            <!-- <div class="box"> -->
                                 <label class="label">วิธีทำ</label>
                                 <div class="content">
-                                    <ol type="1">
-                                        <li v-for="item in methodCook" :key="item">
-                                            {{ item }}
-                                        </li>
-                                    </ol>
+                                    <!-- <ol type="1"> -->
+                                        <div class="box pt-2 pb-2 has-background-link-light" v-for="(item, index) in methodCook" :key="item">
+                                            <span>{{ item }}</span>
+                                            <div class="is-pulled-right">
+                                                <button class="button is-small is-danger is-rounded" style="padding-left: 1em; padding-right: 1em;" @click="deleteMethodItem(index)">
+                                                    <span class="icon is-small">
+                                                        <i class="fa-solid fa-minus"></i>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <!-- </ol> -->
                                 </div>
                                 
                                 <div class="columns">
-                                    <div class="column is-8">
+                                    <div class="column is-9">
                                         <div class="field">
                                             <div class="control">
                                                 <input class="input is-info" id="addIngre" type="text" v-model="newMethod" placeholder="วิธีทำของคุณ">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="column is-4">
+                                    <div class="column is-3">
                                         <div class="field">
                                             <div class="control">
                                                 <button class="button is-link is-light" id="addBtn" @click="addMethodCook()">
@@ -129,9 +146,9 @@
                                           </div>      
                                     </div>
                                 </div>
-                            </div>
+                            <!-- </div> -->
 
-                            <div class="box">
+                            <!-- <div class="box"> -->
                                 <div class="field">
                                     <label class="label">รูปภาพเพิ่มเติม</label>
                                     <div class="file is-info is-centered is-fullwidth">
@@ -146,7 +163,7 @@
                                                 </span>
                                             </span>
                                         </label>
-                                    </div>
+                                    </div> 
                                 </div>
 
 
@@ -164,7 +181,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            <!-- </div> -->
 
 
                             <div class="field is-grouped">
@@ -175,12 +192,16 @@
                                     <router-link to="/">
                                         <button class="button is-primary is-light">cancel</button>
                                     </router-link>
-                                    
                                 </div>
                             </div>
 
+
+
                         </div>
                     <!-- </form> -->
+                </div>
+                <div class="column is-2">
+
                 </div>
             </div>
         </div>
@@ -224,6 +245,12 @@ export default{
             this.moreImages = Array.from(this.moreImages)
             this.moreImages.splice(index, 1)
         },
+        deleteIngreItem(index){
+            this.ingredients.splice(index, 1)
+        },
+        deleteMethodItem(index){
+            this.methodCook.splice(index, 1)
+        },
 
         addIngre(){
             const newIngre = this.newIngre
@@ -236,21 +263,32 @@ export default{
             this.newMethod = ''
         },
         submitPost(){
+
+            if(this.title === ''){
+                alert('กรุณาใส่ชื่อเมนู')
+            }
+            else if(this.typeDessert === 0){
+                alert('กรุณาเลือกประเภทขนม')
+            }
+            else if(this.ingredients.length <= 0){
+                alert('กรุณาเพิ่มส่วนผสม')
+            }
+            else if(this.methodCook.length <= 0){
+                alert('กรุณาเพิ่มวิธีทำ')
+            }
+
             const formData = new FormData();
             formData.append("title", this.title)
             formData.append("description", this.description)
             formData.append("typeDessert", this.typeDessert)
-
             // formData.append("mainImage", this.MainImage)
-
             this.ingredients.forEach((ingre) => {
                 formData.append("ingredient", ingre);
             })
             this.methodCook.forEach((method) => {
                 formData.append("methodCook", method);
             })
-            
-             console.log(this.moreImages.length)
+            // console.log(this.moreImages.length)
             for(let i=0; i<this.moreImages.length; i++){
                 let file = this.moreImages[i]
                 formData.append("moreImages", file)
@@ -263,7 +301,7 @@ export default{
                     },
                 })
                 .then(() => this.$router.push({name: 'home'}))
-                .catch((e) => console.log(e.response.data));
+                .catch((error) => alert(error.response.data.message));
         },
     }
    

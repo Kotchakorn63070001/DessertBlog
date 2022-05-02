@@ -28,11 +28,16 @@ router.get('/create', async function(req, res, next){
 })
 
 router.post('/create',  upload.array("moreImages"), async function(req, res, next){
+    
     const title = req.body.title;
     const description = req.body.description;
     const file = req.file;
     const postTypeId = req.body.typeDessert;
     const files = req.files;
+
+    if (!files) {
+      return res.status(400).json({ message: "Please upload a file" });
+    }
 
     let ingreArray = [];
     let methodArray = [];
@@ -73,7 +78,6 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
             let image = [contentId, files.path.substring(6)]
             imgArray.push(image)
           }
-          
         })
         // console.log('Img Array :', imgArray)
 
@@ -144,7 +148,7 @@ router.get("/posts/:id", function (req, res, next) {
     const promise3 = pool.query("SELECT * FROM content JOIN content_cooking_method USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
-    const promise4 = pool.query("SELECT * FROM content JOIN content_image USING (content_id) WHERE post_id=?", [
+    const promise4 = pool.query("SELECT image FROM content JOIN content_image USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
 
@@ -176,22 +180,100 @@ router.get("/posts/:id", function (req, res, next) {
       });
 });
 
+// เพิ่มยอดวิว
+router.put("/posts/addview/:postId", async function(req, res, next){
+  const conn = await pool.getConnection();
+  await conn.beginTransaction();
+
+  try{
+      const [rows, fields] = await pool.query("SELECT * FROM post WHERE post_id=?", [
+        req.params.postId,
+      ]);
+      let viewNum = rows[0].num_view
+      viewNum += 1
+
+      await pool.query("UPDATE post SET post.num_view=? WHERE post_id=?", [
+        viewNum, req.params.postId,
+      ]);
+
+      await conn.commit();
+      res.json({ view: viewNum });
+  } catch (err) {
+      await conn.rollback();
+      return res.status(500).json(err);
+  } finally {
+      console.log("finally add view post");
+      conn.release();
+  }
+})
 
 // Edit Post
-router.put("/posts/:id", async function (req, res) {
+router.put("/posts/:id",  upload.array("moreImages"), async function (req, res) {
+  
+  const title = req.body.title;
+  const description = req.body.description;
+  // const file = req.file;
+  const postTypeId = req.body.typeDessert;
+  const files = req.files;
+
+  if (!files) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    next(error);
+  }
+
+  let ingreArray = [];
+  let methodArray = [];
+  let imgArray = [];
   const conn = await pool.getConnection()
   await conn.beginTransaction();
 
   try {
-    const file = req.file;
+    if (files.length > 0) {
+      var main = files[0]
+      await conn.query('UPDATE post SET title=?, image=?, description=?, post_type_id=? WHERE id=?', 
+      [title, main.path.substring(6), description, postTypeId, req.params.id])
 
-    if (file) {
+      req.files.forEach((files, index) => {
+        if (index !== 0){
+          let image = [files.path.substring(6), contentId]
+          imgArray.push(image)
+      }
+    })
+
+    const [row, field] = await conn.query('SELECT * FROM content WHERE post_id=?', [req.params.id])
+    let contentId = row[0].content_id
+    // console.log(contentId)
+    
+    req.body.ingredient.forEach((item) => {
+      let ingre = [item, contentId];
+      ingreArray.push(ingre);
+    });
+    // console.log('Ingredient Array :', ingreArray)
+
+    req.body.methodCook.forEach((item) => {
+      let method = [item, contentId]
+      methodArray.push(method)
+    })
+
+    await conn.query(
+      "UPDATE content_ingredient SET ingredient=? WHERE content_id=?",
+      [ingreArray]);
+
       await conn.query(
-        "UPDATE images SET file_path=? WHERE id=?",
-        [file.path, req.params.id])
+        "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
+        [methodArray]);
+
+        await conn.query(
+          "UPDATE content_image SET image=? WHERE content_id=?",
+          [imgArray]);
+
+      // await conn.query(
+      //   "UPDATE images SET file_path=? WHERE id=?",
+      //   [file.path, req.params.id])
     }
 
-    await conn.query('UPDATE blogs SET title=?,content=?, pinned=?, blogs.like=?, create_by_id=? WHERE id=?', [req.body.title, req.body.content, req.body.pinned, req.body.like, null, req.params.id])
+    
     conn.commit()
     res.json({ message: "Update Blog id " + req.params.id + " Complete" })
   } catch (error) {
@@ -208,65 +290,19 @@ router.put("/posts/:id", async function (req, res) {
 router.delete("/posts/:postId", async function (req, res, next) {
   // Your code here
   const conn = await pool.getConnection();
-  // Begin transaction
   await conn.beginTransaction();
 
   try {
-    // Check that there is no comments
-    const [
-      rows1,
-      fields1,
-    ] = await conn.query(
-      "SELECT COUNT(*) FROM `comments` WHERE `blog_id` = ?",
-      [req.params.blogId]
-    );
-    console.log(rows1);
-
-    if (rows1[0]["COUNT(*)"] > 0) {
-      return res
-        .status(400)
-        .json({ message: "Cannot delete blogs with comments" });
-    }
-
-    //Delete files from the upload folder
-    const [
-      images,
-      imageFields,
-    ] = await conn.query(
-      "SELECT `file_path` FROM `images` WHERE `blog_id` = ?",
-      [req.params.blogId]
-    );
-    const appDir = path.dirname(require.main.filename); // Get app root directory
-    console.log(appDir)
-    images.forEach((e) => {
-      const p = path.join(appDir, 'static', e.file_path);
-      fs.unlinkSync(p);
-    });
-
-    // Delete images
-    await conn.query("DELETE FROM `images` WHERE `blog_id` = ?", [
-      req.params.blogId,
-    ]);
-    // Delete the selected blog
-    const [
-      rows2,
-      fields2,
-    ] = await conn.query("DELETE FROM `blogs` WHERE `id` = ?", [
-      req.params.blogId,
-    ]);
-
-    if (rows2.affectedRows === 1) {
-      await conn.commit();
-      res.status(204).send();
-    } else {
-      throw "Cannot delete the selected blog";
-    }
+        await conn.query('DELETE FROM post WHERE post_id=?', [req.params.postId])
+        await conn.commit();
+        res.json({ message: "Delete Post id " + req.params.postId + " Complete" })
   } catch (err) {
-    console.log(err)
-    await conn.rollback();
-    return res.status(500).json(err);
+        console.log(err)
+        await conn.rollback();
+        return res.status(500).json(err);
   } finally {
-    conn.release();
+        console.log('Filnally Delete Post')
+        conn.release();
   }
 });
 

@@ -36,11 +36,11 @@
                     </div>
                     <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
                       <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
-                        <a href="#" class="dropdown-item" @click="editPost(post.post_id)">
+                        <a class="dropdown-item" @click="$router.push({name:'edit-post', params:{id: post.post_id}})">
                           <span>Edit</span>
                         </a>
-                        <a href="#" class="dropdown-item">
-                          <span>Delete</span>
+                        <a class="dropdown-item" @click="deletePost(post)">
+                             <span>Delete</span>
                         </a>
                         <a href="#" class="dropdown-item">
                           <span>Report</span>
@@ -74,7 +74,7 @@
                       <span>{{ post.num_view }}</span>
                   </a>
                   
-                  <a class="button is-small is-primary is-light">
+                  <a class="button is-small is-primary is-light" @click="readMore(post.post_id)">
                     <router-link :to="`/posts/${post.post_id}`">
                       <span>Read More</span>
                     </router-link>
@@ -108,13 +108,8 @@ export default {
       }
     },
     created() {
-       this.getPosts();
-       
-       
+       this.getPosts();    
     },
-    // mounted(){
-    //   this.getPosts();
-    // },
     methods: {
       getPosts(){
         axios
@@ -150,10 +145,46 @@ export default {
           .then((response) => {
             let selectedPost = this.posts.filter(e => e.id === postId)[0]
             selectedPost.num_like = response.data.like
+            this.$router.push("/")
           })
           .catch((err) => {
             console.log(err);
           });
+      },
+      readMore(postId){
+        axios
+          .put(`http://localhost:3000/posts/addview/${postId}`)
+          .then((response) => {
+            let selectedPost = this.posts.filter(e => e.id === postId)[0]
+            selectedPost.num_view = response.data.view
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      editPost(postId){
+        axios
+          .put(`http://localhost:3000/posts/update/${postId}`)
+          .then(() => {
+
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      deletePost(post){
+        const result = confirm(`Are you sure you want to delete '${post.title}'`);
+        if (result) {
+          axios
+            .delete(`http://localhost:3000/posts/${post.post_id}`)
+            .then((response) => {
+              console.log(response)
+              this.$router.push("/");
+            })
+            .catch((error) => {
+              alert(error);
+            });
+        }
       },
       
     }
