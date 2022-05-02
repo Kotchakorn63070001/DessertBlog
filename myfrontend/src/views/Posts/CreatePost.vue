@@ -2,7 +2,7 @@
     <div class="container is-widescreen">
         <div class="m-4">
             <div class="columns">
-                <div class="column is-half is-offset-one-quarter">
+                <div class="column is-three-fifths is-offset-one-fifth">
                     <!-- <form action="/create/" method="POST" enctype="multipart/form-data"> -->
                         <div class="box has-background-link-light	">
                             <div class="field">
@@ -19,11 +19,7 @@
                                 </div>
                             </div>
 
-                            <div class="columns">
-                                <div class="column is-8">
-                                    
-                                </div>
-                            </div>
+                           
                             <div class="field">
                                 <label class="label">ประเภทขนม</label>
                                 <div class="select is-info">
@@ -35,28 +31,30 @@
                                 </div>
                             </div>
 
-                            <div class="field">
-                                <label class="label">ภาพขนมของคุณ</label>
+                            <!-- <div class="field">
+                                <label class="label">ภาพขนมที่เสร็จแล้วของคุณ</label>
                                 <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" @change="selectMainImage($event)">
-                            </div>
+                            </div> -->
 
                             
                             <!-- <div class="field">
-                                <div id="file-js" class="file is-info is-centered has-name is-boxed  is-fullwidth">
+                                <label class="label">
+                                    <span>ภาพขนมที่อบเสร็จแล้วของคุณ</span>
+                                    <span class="icon">
+                                        <i class="fa-solid fa-cheese"></i>
+                                    </span>
+                                </label>
+                                <div class="file is-info is-centered is-fullwidth">
                                     <label class="file-label">
-                                      <input class="file-input" type="file" accept="image/png, image/jpeg, image/webp" @change="selectImages">
-                                      <span class="file-cta">
-                                        <span class="file-icon">
-                                          <i class="fas fa-upload"></i>
+                                    <input class="file-input" type="file" accept="image/png, image/jpeg, image/jpg, image/webp" @change="selectMainImage($event)">
+                                       <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="fas fa-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                เลือกภาพเมนูของคุณ...
+                                            </span>
                                         </span>
-                                        <span class="file-label has-text-centered">
-                                       
-                                          เลือกภาพเมนูของคุณ
-                                        </span>
-                                      </span>
-                                      <span class="file-name has-text-centered">
-                                        No file uploaded
-                                      </span>
                                     </label>
                                 </div>
                             </div> -->
@@ -101,18 +99,18 @@
                             <div class="box">
                                 <label class="label">วิธีทำ</label>
                                 <div class="content">
-                                    <ul>
+                                    <ol type="1">
                                         <li v-for="item in methodCook" :key="item">
                                             {{ item }}
                                         </li>
-                                    </ul>
+                                    </ol>
                                 </div>
                                 
                                 <div class="columns">
                                     <div class="column is-8">
                                         <div class="field">
                                             <div class="control">
-                                                <input class="input is-info" id="addIngre" type="text" v-model="newMethod" placeholder="ส่วนผสมของคุณ">
+                                                <input class="input is-info" id="addIngre" type="text" v-model="newMethod" placeholder="วิธีทำของคุณ">
                                             </div>
                                         </div>
                                     </div>
@@ -132,6 +130,42 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="box">
+                                <div class="field">
+                                    <label class="label">รูปภาพเพิ่มเติม</label>
+                                    <div class="file is-info is-centered is-fullwidth">
+                                        <label class="file-label">
+                                        <input class="file-input" type="file" multiple accept="image/png, image/jpeg, image/jpg, image/webp"  @change="selectMoreImage($event)">
+                                           <span class="file-cta">
+                                                <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                </span>
+                                                <span class="file-label">
+                                                    เลือกภาพขั้นตอนการอบเมนูของคุณ...
+                                                </span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+
+                                <div v-if="moreImages" class="columns is-multiline">
+                                    <div v-for="(image, index) in moreImages" :key="image.id" class="column is-one-quarter">
+                                        <div class="card">
+                                            <div class="card-image">
+                                                <figure class="image is-4by3">
+                                                    <img :src="showImage(image)" alt="Placeholder image">
+                                                </figure>
+                                            </div>
+                                            <footer class="card-footer">
+                                                <a @click="deleteImage(index)" class="card-footer-item">Delete</a>
+                                            </footer>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <div class="field is-grouped">
                                 <div class="control">
@@ -162,18 +196,35 @@ export default{
             title: '',
             description: '',
             typeDessert: 0,
-            MainImage: '',
+            // MainImage: '',
             ingredients: [],
             methodCook: [],
             newIngre: '',
             newMethod: '',
+            moreImages: [],
         }
     },
+    created(){
+        console.log(this.moreImages.length)
+    },
     methods:{
-        selectMainImage(event){
-            this.MainImage = event.target.files[0];
+        // selectMainImage(event){
+        //     this.MainImage = event.target.files[0];
+        // },
+        selectMoreImage(event){
+            let file = event.target.files;
+            for (let i=0; i<file.length; i++){
+                this.moreImages.push(file[i])
+            }
         },
-  
+        showImage(image){
+            return URL.createObjectURL(image)
+        },
+        deleteImage(index){
+            this.moreImages = Array.from(this.moreImages)
+            this.moreImages.splice(index, 1)
+        },
+
         addIngre(){
             const newIngre = this.newIngre
             this.ingredients.push(newIngre)
@@ -189,26 +240,27 @@ export default{
             formData.append("title", this.title)
             formData.append("description", this.description)
             formData.append("typeDessert", this.typeDessert)
-            // this.imageMain.forEach((image) => {
-            //     formData.append("mainImage", image)
-            // })
-            formData.append("mainImage", this.MainImage)
-            // this.images.forEach((image) => {
-            //     formData.append("mainImage", image);
-            // });
+
+            // formData.append("mainImage", this.MainImage)
+
             this.ingredients.forEach((ingre) => {
                 formData.append("ingredient", ingre);
             })
             this.methodCook.forEach((method) => {
                 formData.append("methodCook", method);
             })
+            
+             console.log(this.moreImages.length)
+            for(let i=0; i<this.moreImages.length; i++){
+                let file = this.moreImages[i]
+                formData.append("moreImages", file)
+            }
             axios
                 .post("http://localhost:3000/create", formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },
-                    // data: JSON.stringify(formData)
                 })
                 .then(() => this.$router.push({name: 'home'}))
                 .catch((e) => console.log(e.response.data));

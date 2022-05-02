@@ -27,31 +27,26 @@ router.get('/create', async function(req, res, next){
     // res.send('Hello World!')
 })
 
-router.post('/create', upload.single("mainImage"), async function(req, res, next){
+router.post('/create',  upload.array("moreImages"), async function(req, res, next){
     const title = req.body.title;
-    console.log(title)
     const description = req.body.description;
     const file = req.file;
     const postTypeId = req.body.typeDessert;
-    
+    const files = req.files;
+
     let ingreArray = [];
     let methodArray = [];
+    let imgArray = [];
 
     const conn = await pool.getConnection()
     await conn.beginTransaction()
 
     try{
-
-      // req.files.forEach((file, index) => {
-      //   let path = [title, file.path.substring(6), description, 1, 1];
-      //   pathArray.push(path);
-      // });
-      // console.log('path : ',path)
-      // console.log('pathArray : ',pathArray)
+        var main = files[0]
 
         const [rows, fields] = await conn.query(
             'INSERT INTO post(title, date, img, description, user_id, post_type_id) VALUES(?, CURRENT_TIMESTAMP, ?, ? ,?, ?)',
-            [title, file.path.substring(6), description, 1, postTypeId]
+            [title, main.path.substring(6), description, 1, postTypeId]
         )
         let postId = rows.insertId;
 
@@ -73,6 +68,15 @@ router.post('/create', upload.single("mainImage"), async function(req, res, next
           methodArray.push(method)
         })
 
+        req.files.forEach((files, index) => {
+          if (index !== 0){
+            let image = [contentId, files.path.substring(6)]
+            imgArray.push(image)
+          }
+          
+        })
+        // console.log('Img Array :', imgArray)
+
         await conn.query(
           "INSERT INTO content_ingredient(content_id, ingredient) VALUES ?",
           [ingreArray]
@@ -81,6 +85,11 @@ router.post('/create', upload.single("mainImage"), async function(req, res, next
         await conn.query(
           "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES ?",
           [methodArray]
+        );
+
+        await conn.query(
+          "INSERT INTO content_image(content_id, image) VALUES ?",
+          [imgArray]
         );
 
         await conn.commit()
@@ -135,18 +144,24 @@ router.get("/posts/:id", function (req, res, next) {
     const promise3 = pool.query("SELECT * FROM content JOIN content_cooking_method USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
+    const promise4 = pool.query("SELECT * FROM content JOIN content_image USING (content_id) WHERE post_id=?", [
+      req.params.id,
+    ]);
 
-    Promise.all([promise1, promise2, promise3])
+    Promise.all([promise1, promise2, promise3, promise4])
       .then((results) => {
         const posts = results[0];
         const ingredients = results[1];
         const methods = results[2];
+        const images = results[3]
         console.log(posts[0][0])
         console.log(ingredients[0])
+        console.log(images[0])
         res.json({
           posts: posts[0][0],
           ingredients: ingredients[0],
           methods: methods[0],
+          images: images[0],
           error: null,
         });
         // res.send({

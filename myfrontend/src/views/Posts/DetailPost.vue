@@ -14,7 +14,7 @@
                     <div class="card-image pt-5">
                         <div class="columns is-centered">
                                 <div class="column is-half">
-                                    <figure class="image ">
+                                    <figure class="image">
                                         <img :src="imagePath(post.img)" alt="Placeholder image">
                                     </figure>
                                 </div>
@@ -37,6 +37,21 @@
                                 <li v-for="method in methods" :key="method.cooking_method_no">{{ method.cooking_method }}</li>
                             </ol>
                         </div>
+                       
+                     
+                            <div class="columns  is-gapless is-multiline">
+                                <div class="column " v-for="image in images" :key="image.image_no">
+                                   
+                                    <figure class="image"  >
+                                        <img :src="imagePath(image.image)" style="width: 100%; border-radius: 5%" alt="Placeholder image">
+                                    </figure>
+                           
+                                </div>
+                            </div>
+   
+                   
+                            
+                      
                         
                     </div>
            
@@ -59,6 +74,7 @@ export default{
             post: {},
             ingredients: [],
             methods: [],
+            images: [],
             error: null,
         }
     },
@@ -72,7 +88,8 @@ export default{
             .then((response) => {
                 this.post = response.data.posts;
                 this.ingredients = response.data.ingredients;
-                this.methods = response.data.methods
+                this.methods = response.data.methods;
+                this.images = response.data.images;
 
             })
             .catch((error) => {
