@@ -126,9 +126,9 @@
                             <!-- <div class="box"> -->
                                 <div class="field">
                                     <label class="label">รูปภาพเพิ่มเติม</label>
-                                    <div class="file is-info is-centered is-fullwidth">
+                                    <!-- <div class="file is-info is-centered is-fullwidth">
                                         <label class="file-label">
-                                        <input class="file-input" type="file" multiple accept="image/png, image/jpeg, image/jpg, image/webp"  @change="selectMoreImage($event)">
+                                        <input class="file-input" type="file" multiple accept="image/png, image/jpeg, image/jpg, image/webp"  @change="selectNewImage($event)">
                                            <span class="file-cta">
                                                 <span class="file-icon">
                                                     <i class="fas fa-upload"></i>
@@ -138,7 +138,7 @@
                                                 </span>
                                             </span>
                                         </label>
-                                    </div> 
+                                    </div>  -->
                                 </div>
 
                                 
@@ -155,13 +155,27 @@
                                             </footer>
                                         </div>
                                     </div>
+                                    <!-- <div v-for="(image, index) in newImage" :key="image.id" class="column is-one-quarter">
+                                        <div class="card">
+                                            <div class="card-image">
+                                                <figure class="image is-4by3">
+                                                    <img :src="showImage(image)" alt="Placeholder image">
+                                                    
+                                                </figure>
+                                            </div>
+                                            <footer class="card-footer">
+                                                <a @click="deleteNewImage(index)" class="card-footer-item">Delete</a>
+                                            </footer>
+                                        </div>
+                                    </div> -->
+                                    <!-- <img v-if="image.type === 'image/png' || image.type === 'image/jpeg' || image.type === 'image/jpg' || image.type === 'image/webp'" :src="showImage(image)" alt="Placeholder image"> -->
                                 </div>
                             <!-- </div> -->
 
 
                             <div class="field is-grouped">
                                 <div class="control">
-                                    <button class="button is-primary" @click="savePost">submit</button>
+                                    <button class="button is-primary" @click="savePost">save</button>
                                 </div>
                                 <div class="control">
                                     <router-link to="/">
@@ -198,6 +212,7 @@ export default{
             newIngre: '',
             newMethod: '',
             moreImages: [],
+            newImage: [],
         }
     },
     created(){
@@ -216,24 +231,30 @@ export default{
             .catch((error) => {
                 console.log(error)
             })
+
+            // console.log(this.$route.params.id)
     },
     methods:{
         // selectMainImage(event){
         //     this.MainImage = event.target.files[0];
         // },
-        selectMoreImage(event){
+        selectNewImage(event){
             let file = event.target.files;
             for (let i=0; i<file.length; i++){
-                this.moreImages.push(file[i])
+                this.newImage.push(file[i])
             }
         },
-        // showImage(image){
-        //     return URL.createObjectURL(image)
-        // },
-        // deleteImage(index){
-        //     this.moreImages = Array.from(this.moreImages)
-        //     this.moreImages.splice(index, 1)
-        // },
+        showImage(image){
+            return URL.createObjectURL(image)
+        },
+        deleteNewImage(index){
+            this.newImage = Array.from(this.newImage)
+            this.newImage.splice(index, 1)
+        },
+        deleteImage(index){
+            this.moreImages = Array.from(this.moreImages)
+            this.moreImages.splice(index, 1)
+        },
         imagePath(file_path) {
             if (file_path){
                 return 'http://localhost:3000/' + file_path
@@ -242,45 +263,85 @@ export default{
                 return 'https://bulma.io/images/placeholders/640x360.png'
             }
         },
+        deleteIngreItem(index){
+            this.ingredients.splice(index, 1)
+        },
+        deleteMethodItem(index){
+            this.methodCook.splice(index, 1)
+        },
         addIngre(){
-            const newIngre = this.newIngre
-            this.ingredients.push(newIngre)
-            this.newIngre = ''
+            if(this.newIngre === ''){
+                alert('กรุณาใส่ส่วนผสม')
+            }
+            else{
+                const newIngre = this.newIngre
+                this.ingredients.push({ingredient: newIngre})
+                this.newIngre = ''
+            }
         },
         addMethodCook(){
-            const newMethod = this.newMethod
-            this.methodCook.push(newMethod)
-            this.newMethod = ''
+            if(this.newMethod === ''){
+                alert('กรุณาใส่วิธีทำ')
+            }
+            else{
+                const newMethod = this.newMethod
+                this.methodCook.push({cooking_method: newMethod})
+                this.newMethod = ''
+            }
         },
         savePost(){
-            const formData = new FormData();
-            formData.append("title", this.title)
-            formData.append("description", this.description)
-            formData.append("typeDessert", this.typeDessert)
-
-            // formData.append("mainImage", this.MainImage)
-
-            this.ingredients.forEach((ingre) => {
-                formData.append("ingredient", ingre);
-            })
-            this.methodCook.forEach((method) => {
-                formData.append("methodCook", method);
-            })
-            
-            //  console.log(this.moreImages.length)
-            for(let i=0; i<this.moreImages.length; i++){
-                let file = this.moreImages[i]
-                formData.append("moreImages", file)
+            if(this.title === ''){
+                alert('กรุณาใส่ชื่อเมนู')
             }
-            axios
-                .put("http://localhost:3000/create", formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                })
-                .then(() => this.$router.push({name: 'home'}))
-                .catch((error) => alert(error.response.data.message));
+            else if(this.typeDessert === 0){
+                alert('กรุณาเลือกประเภทขนม')
+            }
+            else if(this.ingredients.length <= 0){
+                alert('กรุณาเพิ่มส่วนผสม')
+            }
+            else if(this.methodCook.length <= 0){
+                alert('กรุณาเพิ่มวิธีทำ')
+            }
+            else if(this.moreImages.length === 0){
+                alert('กรุณาเพิ่มรูปภาพ')
+            }
+            else{
+                const formData = new FormData();
+                formData.append("title", this.title)
+                formData.append("description", this.description)
+                formData.append("typeDessert", this.typeDessert)
+
+                // formData.append("mainImage", this.MainImage)
+
+                // this.ingredients.forEach((ingre) => {
+                //     formData.append("ingredient", ingre);
+                // })
+                // this.methodCook.forEach((method) => {
+                //     formData.append("methodCook", method);
+                // })
+            
+                //  console.log(this.moreImages.length)
+                // for(let i=0; i<this.moreImages.length; i++){
+                //     let file = this.moreImages[i]
+                //     formData.append("moreImages", file)
+                // }
+                // for(let i=0; i<this.newImage.length; i++){
+                //     let file = this.newImage[i]
+                //     formData.append("newImage", file)
+                // }
+                axios
+                    .put(`http://localhost:3000/posts/update/${this.$route.params.id}`, formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        },
+                    })
+                    .then(() => this.$router.push({name: 'home'}))
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+
         },
     }
    

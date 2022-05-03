@@ -24,6 +24,11 @@ const routes = [
     path: '/posts/update/:id',
     name: 'edit-post',
     component: () => import('../views/Posts/EditPost.vue')
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfilePage.vue')
   }
 ]
 

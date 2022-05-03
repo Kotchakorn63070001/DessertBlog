@@ -253,14 +253,25 @@ export default{
         },
 
         addIngre(){
-            const newIngre = this.newIngre
-            this.ingredients.push(newIngre)
-            this.newIngre = ''
+            if(this.newIngre === ''){
+                alert('กรุณาใส่ส่วนผสม')
+            }
+            else{
+                const newIngre = this.newIngre
+                this.ingredients.push(newIngre)
+                this.newIngre = ''
+            }
+
         },
         addMethodCook(){
-            const newMethod = this.newMethod
-            this.methodCook.push(newMethod)
-            this.newMethod = ''
+            if(this.newMethod === ''){
+                alert('กรุณาใส่วิธีทำ')
+            }
+            else{
+                const newMethod = this.newMethod
+                this.methodCook.push(newMethod)
+                this.newMethod = ''
+            }
         },
         submitPost(){
 
@@ -276,32 +287,36 @@ export default{
             else if(this.methodCook.length <= 0){
                 alert('กรุณาเพิ่มวิธีทำ')
             }
-
-            const formData = new FormData();
-            formData.append("title", this.title)
-            formData.append("description", this.description)
-            formData.append("typeDessert", this.typeDessert)
-            // formData.append("mainImage", this.MainImage)
-            this.ingredients.forEach((ingre) => {
-                formData.append("ingredient", ingre);
-            })
-            this.methodCook.forEach((method) => {
-                formData.append("methodCook", method);
-            })
-            // console.log(this.moreImages.length)
-            for(let i=0; i<this.moreImages.length; i++){
-                let file = this.moreImages[i]
-                formData.append("moreImages", file)
+            else if(this.moreImages.length === 0){
+                alert('กรุณาเพิ่มรูปภาพ')
             }
-            axios
-                .post("http://localhost:3000/create", formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
+            else{
+                const formData = new FormData();
+                formData.append("title", this.title)
+                formData.append("description", this.description)
+                formData.append("typeDessert", this.typeDessert)
+                // formData.append("mainImage", this.MainImage)
+                this.ingredients.forEach((ingre) => {
+                    formData.append("ingredient", ingre);
+                 })
+                this.methodCook.forEach((method) => {
+                    formData.append("methodCook", method);
                 })
-                .then(() => this.$router.push({name: 'home'}))
-                .catch((error) => alert(error.response.data.message));
+                // console.log(this.moreImages.length)
+                for(let i=0; i<this.moreImages.length; i++){
+                    let file = this.moreImages[i]
+                    formData.append("moreImages", file)
+                }
+                axios
+                    .post("http://localhost:3000/create", formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                         },
+                    })
+                    .then(() => this.$router.push({name: 'home'}))
+                    .catch((error) => alert(error.response.data.message));
+                }
         },
     }
    

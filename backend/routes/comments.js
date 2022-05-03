@@ -22,7 +22,7 @@ const router = express.Router();
 // Get comment
 router.get('/:postId/comments', async function(req, res, next){
     try {
-        const [rows, fields] = await pool.query("SELECT * FROM comments WHERE blog_id = ?",
+        const [rows, fields] = await pool.query("SELECT * FROM comment WHERE post_id = ?",
         [req.params.blogId]);
         // console.log('Get comment = ', rows)
         return res.send({

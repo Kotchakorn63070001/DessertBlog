@@ -45,7 +45,61 @@
                                    </figure>
                             </div>
                         </div>
+
+                        <div class="container pb-3">
+                            <p class="subtitle"><b>Comments</b></p>
+                            <div class="box" v-for="(comment) in comments" :key="comment.id">
+                                <article class="media">
+                                    <div class="media-left">
+                                        <figure class="image is-64x64">
+                                            <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image" />
+                                        </figure>
+                                    </div>
+                                    <div class="media-content">
+                                        <div class="content">
+                                            <!-- <input v-model="editCommentText" class="input" type="text" /> -->
+                                            <p class="is-size-6">@username</p>
+                                            <p class="is-size-6">{{ comment.comment_text }}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                            <div class="dropdown is-right is-hoverable">
+                                                <div class="dropdown-trigger">
+                                                <button class="button is-small is-link is-light is-rounded" aria-haspopup="true" aria-controls="dropdown-menu3" style="padding-left: 1em; padding-right: 1em;">
+                                                    <span class="icon is-medium">
+                                                    <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
+                                                    </span>
+                                                </button>
+                                                </div>
+                                                <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
+                                                <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
+                                                    <a class="dropdown-item">
+                                                    <span>Edit</span>
+                                                    </a>
+                                                    <a class="dropdown-item">
+                                                        <span>Delete</span>
+                                                    </a>
+                                                    <a href="#" class="dropdown-item">
+                                                    <span>Report</span>
+                                                    </a>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </article>
+            </div>
+              <!-- <div class="columns">
+                <div class="column is-8">
+                  <input type="text" class="input" v-model="commTxt" placeholder="Add new comment" />
+                </div>
+                <div class="column is-4">
+                  <button @click="addComment" class="button">Add comment</button>
+                </div>
+              </div> -->
+                </div>
                     </div>
+
+
            
                     <footer class="card-footer">
                         <a class="card-footer-item" href="/">To Home Page</a>
@@ -67,6 +121,7 @@ export default{
             ingredients: [],
             methods: [],
             images: [],
+            comments: [],
             error: null,
         }
     },
@@ -82,6 +137,7 @@ export default{
                 this.ingredients = response.data.ingredients;
                 this.methods = response.data.methods;
                 this.images = response.data.images;
+                this.comments = response.data.comments
 
             })
             .catch((error) => {

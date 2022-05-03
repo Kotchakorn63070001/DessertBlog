@@ -22,16 +22,16 @@ router = express.Router();
 
 
 
-router.get('/create', async function(req, res, next){
-    res.render('create')
-    // res.send('Hello World!')
-})
+// router.get('/create', async function(req, res, next){
+//     res.render('create')
+//     // res.send('Hello World!')
+// })
 
 router.post('/create',  upload.array("moreImages"), async function(req, res, next){
     
     const title = req.body.title;
     const description = req.body.description;
-    const file = req.file;
+    // const file = req.file;
     const postTypeId = req.body.typeDessert;
     const files = req.files;
 
@@ -142,22 +142,26 @@ router.get("/posts/:id", function (req, res, next) {
     const promise1 = pool.query("SELECT * FROM post JOIN content USING (post_id) WHERE post_id=?", [
       req.params.id,
     ]);
-    const promise2 = pool.query("SELECT * FROM content JOIN content_ingredient USING (content_id) WHERE post_id=?", [
+    const promise2 = pool.query("SELECT ingredient FROM content JOIN content_ingredient USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
-    const promise3 = pool.query("SELECT * FROM content JOIN content_cooking_method USING (content_id) WHERE post_id=?", [
+    const promise3 = pool.query("SELECT cooking_method FROM content JOIN content_cooking_method USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
     const promise4 = pool.query("SELECT image FROM content JOIN content_image USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
+    const promise5 = pool.query("SELECT * FROM comment WHERE post_id=?", [
+      req.params.id,
+    ]);
 
-    Promise.all([promise1, promise2, promise3, promise4])
+    Promise.all([promise1, promise2, promise3, promise4, promise5])
       .then((results) => {
         const posts = results[0];
         const ingredients = results[1];
         const methods = results[2];
-        const images = results[3]
+        const images = results[3];
+        const comments = results[4];
         console.log(posts[0][0])
         console.log(ingredients[0])
         console.log(images[0])
@@ -166,6 +170,7 @@ router.get("/posts/:id", function (req, res, next) {
           ingredients: ingredients[0],
           methods: methods[0],
           images: images[0],
+          comments: comments[0],
           error: null,
         });
         // res.send({
@@ -208,79 +213,110 @@ router.put("/posts/addview/:postId", async function(req, res, next){
 })
 
 // Edit Post
-router.put("/posts/:id",  upload.array("moreImages"), async function (req, res) {
+router.put("/posts/update/:id", async function (req, res) {
   
   const title = req.body.title;
+  console.log('title : ', title)
   const description = req.body.description;
+  console.log('description: ', description)
   // const file = req.file;
   const postTypeId = req.body.typeDessert;
-  const files = req.files;
+  console.log('post_type_id : ',postTypeId)
+  // const files = req.files;
 
-  if (!files) {
-    const error = new Error("Please upload a file");
-    error.httpStatusCode = 400;
-    next(error);
-  }
+  // if (!files) {
+  //   const error = new Error("Please upload a file");
+  //   error.httpStatusCode = 400;
+  //   next(error);
+  // }
 
-  let ingreArray = [];
-  let methodArray = [];
-  let imgArray = [];
+  // let ingreArray = [];
+  // let methodArray = [];
+  // let imgArray = [];
+
   const conn = await pool.getConnection()
   await conn.beginTransaction();
 
   try {
-    if (files.length > 0) {
-      var main = files[0]
-      await conn.query('UPDATE post SET title=?, image=?, description=?, post_type_id=? WHERE id=?', 
-      [title, main.path.substring(6), description, postTypeId, req.params.id])
 
-      req.files.forEach((files, index) => {
-        if (index !== 0){
-          let image = [files.path.substring(6), contentId]
-          imgArray.push(image)
-      }
-    })
+      // var main = files[0]
+      await conn.query('UPDATE post SET title=?,  description=?, post_type_id=? WHERE post_id=?', 
+      [title,  description, postTypeId, req.params.id])
 
-    const [row, field] = await conn.query('SELECT * FROM content WHERE post_id=?', [req.params.id])
-    let contentId = row[0].content_id
+      const [row, field] = await conn.query('SELECT * FROM content WHERE post_id=?', [req.params.id])
+      var contentId = row[0].content_id
     // console.log(contentId)
-    
-    req.body.ingredient.forEach((item) => {
-      let ingre = [item, contentId];
-      ingreArray.push(ingre);
-    });
+
+
+    // req.body.ingredient.forEach((item) => {
+    //   let ingre = [item];
+    //   ingreArray.push(ingre);
+    // });
     // console.log('Ingredient Array :', ingreArray)
 
-    req.body.methodCook.forEach((item) => {
-      let method = [item, contentId]
-      methodArray.push(method)
-    })
+    // req.body.methodCook.forEach((item) => {
+    //   let method = [item]
+    //   methodArray.push(method)
+    // })
+    
+    // const [row1, field1] = await conn.query('SELECT count(*) num_method FROM content_cooking_method where content_id = ?;', [contentId])
+    // var num_method = row1[0].num_method
 
-    await conn.query(
-      "UPDATE content_ingredient SET ingredient=? WHERE content_id=?",
-      [ingreArray]);
+    // if (num_method < methodArray.length){
+    //   let numInsert = methodArray.length - num_method
+    //   for(let i=0; i<num_method; i++){
+    //     await conn.query(
+    //       "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
+    //       [methodArray[i], contentId]);
+    //   }
+    //   for(let i=num_method; i<methodArray.length; i++){
+    //     await conn.query(
+    //       "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
+    //       [methodArray[i], contentId]);
+    //   }
+    // }
 
-      await conn.query(
-        "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
-        [methodArray]);
+    // if (files.length > 0) {
+    //   req.files.forEach((files, index) => {
+    //     if (index !== 0){
+    //       let image = [files.path.substring(6), contentId]
+    //       imgArray.push(image)
+    //     }
+    //   })
 
-        await conn.query(
-          "UPDATE content_image SET image=? WHERE content_id=?",
-          [imgArray]);
+    //   // for (let i=0; i<imgArray.length; i++){
+    //     await conn.query(
+    //       "INSERT INTO content_image(content_id, image) VALUES ?",
+    //       [imgArray]);
+    //   // }
 
-      // await conn.query(
-      //   "UPDATE images SET file_path=? WHERE id=?",
-      //   [file.path, req.params.id])
-    }
+    // }
+    // else if(files.length < 1){
+    //     await conn.query("DELETE FROM content_image WHERE content_id = ?", 
+    //     [contentId])
+    // }
+
+    
+    
+
+
+    // for(let i=0; i<ingreArray.length; i++){
+    //   await conn.query(
+    //     "UPDATE content_ingredient SET ingredient=? WHERE content_id=?",
+    //     [ingreArray[i], contentId]);
+    // }
+
+
+
 
     
     conn.commit()
-    res.json({ message: "Update Blog id " + req.params.id + " Complete" })
+    res.json({ message: "Update Post id " + req.params.id + " Complete" })
   } catch (error) {
-    await conn.rollback();
-    return next(error)
+    console.log(error)
+    await conn.rollback()
   } finally {
-    console.log('finally')
+    console.log('finally update post')
     conn.release();
   }
 });
@@ -299,7 +335,7 @@ router.delete("/posts/:postId", async function (req, res, next) {
   } catch (err) {
         console.log(err)
         await conn.rollback();
-        return res.status(500).json(err);
+        // return res.status(500).json(err);
   } finally {
         console.log('Filnally Delete Post')
         conn.release();

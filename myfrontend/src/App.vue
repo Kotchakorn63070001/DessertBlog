@@ -49,7 +49,9 @@
 
         <div class="navbar-dropdown is-right">
           <a class="navbar-item">
-            Profile
+            <router-link to="/profile">
+              <span>Profile</span>
+            </router-link>
           </a>
           <a class="navbar-item">
             Log out
