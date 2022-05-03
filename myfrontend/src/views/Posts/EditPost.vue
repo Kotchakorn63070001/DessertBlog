@@ -7,7 +7,7 @@
                 </div>
                 <div class="column is-8">
 
-                        <div class="box 	">
+                        <div class="box">
                             <div class="field">
                                 <label class="label">ชื่อเมนู</label>
                                 <div class="control">
@@ -313,12 +313,12 @@ export default{
 
                 // formData.append("mainImage", this.MainImage)
 
-                // this.ingredients.forEach((ingre) => {
-                //     formData.append("ingredient", ingre);
-                // })
-                // this.methodCook.forEach((method) => {
-                //     formData.append("methodCook", method);
-                // })
+                this.ingredients.forEach((ingre) => {
+                    formData.append("ingredient", ingre.ingredient);
+                })
+                this.methodCook.forEach((method) => {
+                    formData.append("methodCook", method.cooking_method);
+                })
             
                 //  console.log(this.moreImages.length)
                 // for(let i=0; i<this.moreImages.length; i++){

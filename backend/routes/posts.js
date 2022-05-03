@@ -213,7 +213,7 @@ router.put("/posts/addview/:postId", async function(req, res, next){
 })
 
 // Edit Post
-router.put("/posts/update/:id", async function (req, res) {
+router.put("/posts/update/:id", upload.array("moreImages"),async function (req, res) {
   
   const title = req.body.title;
   console.log('title : ', title)
@@ -230,8 +230,8 @@ router.put("/posts/update/:id", async function (req, res) {
   //   next(error);
   // }
 
-  // let ingreArray = [];
-  // let methodArray = [];
+  let ingreArray = [];
+  let methodArray = [];
   // let imgArray = [];
 
   const conn = await pool.getConnection()
@@ -248,34 +248,92 @@ router.put("/posts/update/:id", async function (req, res) {
     // console.log(contentId)
 
 
-    // req.body.ingredient.forEach((item) => {
-    //   let ingre = [item];
-    //   ingreArray.push(ingre);
-    // });
+    req.body.ingredient.forEach((item) => {
+      console.log('item ingre : ', item)
+      let ingre = item;
+      ingreArray.push(ingre);
+    });
     // console.log('Ingredient Array :', ingreArray)
+    // console.log(req.body.methodCook)
+    req.body.methodCook.forEach((item) => {
+      console.log('item method : ', item)
+      let method = item
+      methodArray.push(method)
+    })
 
-    // req.body.methodCook.forEach((item) => {
-    //   let method = [item]
-    //   methodArray.push(method)
-    // })
+    // update cooking_ingre
+    const [row1, field1] = await conn.query('SELECT count(*) num_ingre FROM content_ingredient where content_id = ?;', [contentId])
+    var num_ingre = row1[0].num_ingre
+    console.log('num_ingre : ', num_ingre)
+
+    // กรณีที่วิธีทำเดิมใน db มัน < ที่แก้ไข
+    if (num_ingre < ingreArray.length){
+      // let numInsert = ingreArray.length - num_ingre
+      for(let i=0; i<num_ingre; i++){
+        await conn.query(
+          "UPDATE content_ingredient SET ingredient=? WHERE content_id=?",
+          [ingreArray[i], contentId]);
+      }
+      for(let i=num_ingre; i<ingreArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_ingredient(content_id, ingredient) VALUES (?, ?)",
+          [contentId, ingreArray[i]]);
+      }
+    }
+    // กรณีที่วิธีทำเดิมใน db มัน > ที่แก้ไข
+    else if(num_ingre > ingreArray.length){
+      await conn.query('DELETE FROM content_ingredient WHERE content_id = ?', [contentId])
+      for(let i=0; i<ingreArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_ingredient(content_id, ingredient) VALUES (?, ?)",
+          [contentId, ingreArray[i]]);
+      }
+    }
+    else if(num_ingre === ingreArray.length){
+      await conn.query('DELETE FROM content_ingredient WHERE content_id = ?', [contentId])
+      for(let i=0; i<ingreArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_ingredient(content_id, ingredient) VALUES (?, ?)",
+          [contentId, ingreArray[i]]);
+      }
+    }
     
-    // const [row1, field1] = await conn.query('SELECT count(*) num_method FROM content_cooking_method where content_id = ?;', [contentId])
-    // var num_method = row1[0].num_method
+    // update cooking_method //
+    const [row2, field2] = await conn.query('SELECT count(*) num_method FROM content_cooking_method where content_id = ?;', [contentId])
+    var num_method = row2[0].num_method
+    console.log('num_method : ',num_method)
 
-    // if (num_method < methodArray.length){
-    //   let numInsert = methodArray.length - num_method
-    //   for(let i=0; i<num_method; i++){
-    //     await conn.query(
-    //       "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
-    //       [methodArray[i], contentId]);
-    //   }
-    //   for(let i=num_method; i<methodArray.length; i++){
-    //     await conn.query(
-    //       "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
-    //       [methodArray[i], contentId]);
-    //   }
-    // }
-
+    // กรณีที่วิธีทำเดิมใน db มัน < ที่แก้ไข
+    if (num_method < methodArray.length){
+      // let numInsert = methodArray.length - num_method
+      for(let i=0; i<num_method; i++){
+        await conn.query(
+          "UPDATE content_cooking_method SET cooking_method=? WHERE content_id=?",
+          [methodArray[i], contentId]);
+      }
+      for(let i=num_method; i<methodArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES (?, ?)",
+          [contentId, methodArray[i]]);
+      }
+    }
+    // กรณีที่วิธีทำเดิมใน db มัน > ที่แก้ไข
+    else if(num_method > methodArray.length){
+      await conn.query('DELETE FROM content_cooking_method WHERE content_id = ?', [contentId])
+      for(let i=0; i<methodArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES (?, ?)",
+          [contentId, methodArray[i]]);
+      }
+    }
+    else if(num_method === methodArray.length){
+      await conn.query('DELETE FROM content_cooking_method WHERE content_id = ?', [contentId])
+      for(let i=0; i<methodArray.length; i++){
+        await conn.query(
+          "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES (?, ?)",
+          [contentId, methodArray[i]]);
+      }
+    }
     // if (files.length > 0) {
     //   req.files.forEach((files, index) => {
     //     if (index !== 0){
