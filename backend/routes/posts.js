@@ -420,34 +420,17 @@ router.put("/posts/update/:id", upload.array("newImage"),async function (req, re
           "INSERT INTO content_img(content_id, image) VALUES ?",
           [imgArray]
         );
-
       }
-
-
     }
-
     
-    
-
-
-    // for(let i=0; i<ingreArray.length; i++){
-    //   await conn.query(
-    //     "UPDATE content_ingredient SET ingredient=? WHERE content_id=?",
-    //     [ingreArray[i], contentId]);
-    // }
-
-
-
-
-    
-    conn.commit()
-    res.json({ message: "Update Post id " + req.params.id + " Complete" })
+      conn.commit()
+      res.json({ message: "Update Post id " + req.params.id + " Complete" })
   } catch (error) {
-    console.log(error)
-    await conn.rollback()
+      console.log(error)
+      await conn.rollback()
   } finally {
-    console.log('finally update post')
-    conn.release();
+      console.log('finally update post')
+      conn.release();
   }
 });
 

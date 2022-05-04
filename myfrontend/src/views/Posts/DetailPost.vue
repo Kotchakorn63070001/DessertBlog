@@ -114,7 +114,7 @@
                     </div>
 
                     <footer class="card-footer">
-                        <a class="card-footer-item" href="/">To Home Page</a>
+                        <a class="card-footer-item" href="/home">To Home Page</a>
                     </footer>
 
                     

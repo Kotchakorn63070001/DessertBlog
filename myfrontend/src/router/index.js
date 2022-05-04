@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'home',
     component: () => import('../views/HomePage.vue')
   },
@@ -29,6 +29,16 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import('../views/ProfilePage.vue')
+  },
+  {
+    path: '/report',
+    name: 'report',
+    component: () => import('../views/Reports/ReportPage.vue')
+  },
+  {
+    path: '/create/report/:postId',
+    name: 'create-report',
+    component: () => import('../views/Reports/CreateReportPost.vue')
   }
 ]
 

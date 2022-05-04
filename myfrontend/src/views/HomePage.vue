@@ -42,8 +42,8 @@
                         <a class="dropdown-item" @click="deletePost(post)">
                              <span>Delete</span>
                         </a>
-                        <a href="#" class="dropdown-item">
-                          <span>Report</span>
+                        <a class="dropdown-item" @click="addReport(post.post_id)">
+                            <span>Report</span>
                         </a>
                       </div>
                     </div>
@@ -137,7 +137,7 @@ export default {
           .then((response) => {
             let selectedPost = this.posts.filter(e => e.id === postId)[0]
             selectedPost.num_like = response.data.like
-            this.$router.push('/')
+            this.$router.push('/home')
           })
           .catch((err) => {
             console.log(err);
@@ -157,8 +157,8 @@ export default {
       editPost(postId){
         axios
           .put(`http://localhost:3000/posts/update/${postId}`)
-          .then(() => {
-
+          .then((response) => {
+            console.log(response.data)
           })
           .catch((err) => {
             console.log(err);
@@ -171,12 +171,15 @@ export default {
             .delete(`http://localhost:3000/posts/${post.post_id}`)
             .then((response) => {
               console.log(response)
-              this.$router.push("/");
+              this.$router.push("/home");
             })
             .catch((error) => {
               alert(error);
             });
         }
+      },
+      addReport(postId){
+        this.$router.push({name: 'create-report', params: { postId: postId}})
       },
       
     }

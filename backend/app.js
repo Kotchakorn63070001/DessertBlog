@@ -18,11 +18,12 @@ app.use(bodyParser.urlencoded({ extended: false}))
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/posts')
 const commentRouter = require('./routes/comments')
+const reportRouter = require('./routes/reports')
 
 app.use(indexRouter.router)
 app.use(postRouter.router)
 app.use(commentRouter.router)
-
+app.use(reportRouter.router)
 
 
 app.listen(3000, () => {

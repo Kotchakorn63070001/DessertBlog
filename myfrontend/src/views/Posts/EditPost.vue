@@ -164,7 +164,7 @@
                                     <button class="button is-primary" @click="savePost">save</button>
                                 </div>
                                 <div class="control">
-                                    <router-link to="/">
+                                    <router-link to="/home">
                                         <button class="button is-primary is-light">cancel</button>
                                     </router-link>
                                 </div>

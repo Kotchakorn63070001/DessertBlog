@@ -17,7 +17,7 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-end">
 
-      <a class="navbar-item" href="/">
+      <a class="navbar-item" href="/home">
         <span class="icon-text">
           <span class="icon">
             <i class="fa-solid fa-house-chimney-window"></i>
@@ -33,6 +33,17 @@
               <i class="fa-solid fa-pen"></i>
             </span>
             <span>Create Post</span>
+          </span>
+        </router-link>
+      </a>
+
+      <a class="navbar-item" >
+        <router-link to="#" class="has-text-white">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fa-solid fa-pen"></i>
+            </span>
+            <span>Report</span>
           </span>
         </router-link>
       </a>
@@ -60,21 +71,18 @@
         </div>
       </div>
 
-      <!-- <div class="navbar-end">
+    
         <div class="navbar-item" >
           <div class="buttons">
             <a class="button is-primary">
-              <router-link to="/user/login" class="has-text-white">
+              <router-link to="#" class="has-text-white">
                 <strong>login</strong>
               </router-link>
             </a>
           </div>
         </div>
-      </div> -->
 
     </div>
-
-    
   </div>
 </nav>
     <router-view :key="$route.fullPath" />

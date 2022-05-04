@@ -24,13 +24,12 @@
                                     <button class="button is-primary" @click="submitReport">submit</button>
                                 </div>
                                 <div class="control">
-                                    <router-link to="/">
+                                    <router-link to="/home">
                                         <button class="button is-primary is-light">cancel</button>
                                     </router-link>
                                 </div>
                             </div>
                             
-                        </div>
                     </div>
                 </div>
             </div>
@@ -39,7 +38,7 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 
 export default{
     data(){
