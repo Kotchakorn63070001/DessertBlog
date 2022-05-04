@@ -15,7 +15,7 @@
                         <div class="columns is-centered">
                                 <div class="column is-half">
                                     <figure class="image">
-                                        <img :src="imagePath(post.img)" alt="Placeholder image">
+                                        <img :src="imagePath(post.img)" style="border-radius: 2%; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;" alt="Placeholder image">
                                     </figure>
                                 </div>
                         </div>
@@ -38,27 +38,27 @@
                             </ol>
                         </div>
 
-                        <div class="columns  is-gapless is-multiline">
-                            <div class="column " v-for="image in images" :key="image.image_no">
-                                <figure class="image"  >
-                                    <img :src="imagePath(image.image)" style="width: 100%; border-radius: 5%" alt="Placeholder image">
+                        <div class="columns is-gapless is-multiline">
+                            <div class="column is-half mt-5" v-for="image in images" :key="image.image_no">
+                                <figure class="image is-5by3">
+                                    <img :src="imagePath(image.image)" style="border-radius: 2%" alt="Placeholder image">
                                    </figure>
                             </div>
                         </div>
 
                         <div class="container pb-3">
                             <p class="subtitle"><b>Comments</b></p>
-                            <div class="box" v-for="(comment) in comments" :key="comment.id">
+                            <div class="box" v-for="(comment, index) in comments" :key="comment.comment_id">
                                 <article class="media">
                                     <div class="media-left">
-                                        <figure class="image is-64x64">
+                                        <figure class="image is-96x96">
                                             <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image" />
                                         </figure>
                                     </div>
                                     <div class="media-content">
                                         <div class="content">
                                             <!-- <input v-model="editCommentText" class="input" type="text" /> -->
-                                            <p class="is-size-6">@username</p>
+                                            <p class="is-size-6"><strong>@username</strong></p>
                                             <p class="is-size-6">{{ comment.comment_text }}</p>
                                         </div>
                                     </div>
@@ -73,10 +73,7 @@
                                                 </div>
                                                 <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
                                                 <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
-                                                    <a class="dropdown-item">
-                                                    <span>Edit</span>
-                                                    </a>
-                                                    <a class="dropdown-item">
+                                                    <a class="dropdown-item" @click="deleteComment(comment.comment_id, index)">
                                                         <span>Delete</span>
                                                     </a>
                                                     <a href="#" class="dropdown-item">
@@ -87,20 +84,35 @@
                                             </div>
                                         </div>
                                 </article>
-            </div>
-              <!-- <div class="columns">
-                <div class="column is-8">
-                  <input type="text" class="input" v-model="commTxt" placeholder="Add new comment" />
-                </div>
-                <div class="column is-4">
-                  <button @click="addComment" class="button">Add comment</button>
-                </div>
-              </div> -->
-                </div>
+                            </div>
+                            <div class="box">
+                                <article class="media">
+                                    <figure class="media-left">
+                                        <p class="image is-96x96">
+                                            <img src="https://bulma.io/images/placeholders/128x128.png">
+                                        </p>
+                                    </figure>
+                                    <div class="media-content">
+                                        <div class="field">
+                                            <p class="is-size-6"><strong>@username</strong></p>
+                                            <p class="control">
+                                                <input type="text" class="input" v-model="newComment" placeholder="Add a comment..." />
+                                            </p>
+                                        </div>
+                                        <nav class="level">
+                                            <div class="level-left"></div>
+                                            <div class="level-right">
+                                                <div class="level-item">
+                                                    <a class="button is-info" @click="submitComment">Submit</a>
+                                                </div>
+                                            </div>
+                                        </nav>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
                     </div>
 
-
-           
                     <footer class="card-footer">
                         <a class="card-footer-item" href="/">To Home Page</a>
                     </footer>
@@ -122,6 +134,7 @@ export default{
             methods: [],
             images: [],
             comments: [],
+            newComment: '',
             error: null,
         }
     },
@@ -151,7 +164,35 @@ export default{
             else {
               return 'https://bulma.io/images/placeholders/640x360.png'
             }
-      },
+        },
+        submitComment(){
+            if (this.newComment !== ''){
+                axios
+                    .post(`http://localhost:3000/${this.$route.params.id}/comments`, {
+                        comment: this.newComment,
+                    })
+                    .then((response) => {
+                        this.newComment = ''
+                        this.comments.push(response.data)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
+        deleteComment(commentId, index){
+            axios
+                .delete(`http://localhost:3000/comments/${commentId}`)
+                .then((response) => {
+                    console.log(response);
+                    this.comments.splice(index, 1);
+                    this.$router.push(`/posts/${this.$route.params.id}`)
+                })
+                .catch((err) => {
+                    console.log(err)
+                });
+        }
+        
     }
    
 }

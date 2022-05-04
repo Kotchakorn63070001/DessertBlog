@@ -31,7 +31,6 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
     
     const title = req.body.title;
     const description = req.body.description;
-    // const file = req.file;
     const postTypeId = req.body.typeDessert;
     const files = req.files;
 
@@ -213,7 +212,7 @@ router.put("/posts/addview/:postId", async function(req, res, next){
 })
 
 // Edit Post
-router.put("/posts/update/:id", upload.array("moreImages"),async function (req, res) {
+router.put("/posts/update/:id", upload.array("newImage"),async function (req, res) {
   
   const title = req.body.title;
   console.log('title : ', title)
@@ -222,24 +221,24 @@ router.put("/posts/update/:id", upload.array("moreImages"),async function (req, 
   // const file = req.file;
   const postTypeId = req.body.typeDessert;
   console.log('post_type_id : ',postTypeId)
-  // const files = req.files;
+  const files = req.files;
 
-  // if (!files) {
-  //   const error = new Error("Please upload a file");
-  //   error.httpStatusCode = 400;
-  //   next(error);
-  // }
+  if (!files) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    next(error);
+  }
 
   let ingreArray = [];
   let methodArray = [];
-  // let imgArray = [];
+  let oldImgArray = [];
+  let imgArray = [];
 
   const conn = await pool.getConnection()
   await conn.beginTransaction();
 
   try {
 
-      // var main = files[0]
       await conn.query('UPDATE post SET title=?,  description=?, post_type_id=? WHERE post_id=?', 
       [title,  description, postTypeId, req.params.id])
 
@@ -260,13 +259,24 @@ router.put("/posts/update/:id", upload.array("moreImages"),async function (req, 
       let method = item
       methodArray.push(method)
     })
+    
+   
+    if (req.body.oldImg !== undefined){
+      req.body.oldImg.forEach((item) => {
+        console.log('item oldImg : ', item)
+        let oldImg = item
+        oldImgArray.push(oldImg)
+      })
+      console.log('OldImg Array :', oldImgArray)
+    }
 
-    // update cooking_ingre
+
+    //// update cooking_ingre ////
     const [row1, field1] = await conn.query('SELECT count(*) num_ingre FROM content_ingredient where content_id = ?;', [contentId])
     var num_ingre = row1[0].num_ingre
     console.log('num_ingre : ', num_ingre)
 
-    // กรณีที่วิธีทำเดิมใน db มัน < ที่แก้ไข
+    // กรณีที่ส่วนผสมเดิมใน db มัน < ที่แก้ไข
     if (num_ingre < ingreArray.length){
       // let numInsert = ingreArray.length - num_ingre
       for(let i=0; i<num_ingre; i++){
@@ -280,7 +290,7 @@ router.put("/posts/update/:id", upload.array("moreImages"),async function (req, 
           [contentId, ingreArray[i]]);
       }
     }
-    // กรณีที่วิธีทำเดิมใน db มัน > ที่แก้ไข
+    // กรณีที่ส่วนผสมเดิมใน db มัน > ที่แก้ไข
     else if(num_ingre > ingreArray.length){
       await conn.query('DELETE FROM content_ingredient WHERE content_id = ?', [contentId])
       for(let i=0; i<ingreArray.length; i++){
@@ -298,7 +308,7 @@ router.put("/posts/update/:id", upload.array("moreImages"),async function (req, 
       }
     }
     
-    // update cooking_method //
+    //// update cooking_method ////
     const [row2, field2] = await conn.query('SELECT count(*) num_method FROM content_cooking_method where content_id = ?;', [contentId])
     var num_method = row2[0].num_method
     console.log('num_method : ',num_method)
@@ -334,25 +344,87 @@ router.put("/posts/update/:id", upload.array("moreImages"),async function (req, 
           [contentId, methodArray[i]]);
       }
     }
-    // if (files.length > 0) {
-    //   req.files.forEach((files, index) => {
-    //     if (index !== 0){
-    //       let image = [files.path.substring(6), contentId]
-    //       imgArray.push(image)
-    //     }
-    //   })
 
-    //   // for (let i=0; i<imgArray.length; i++){
-    //     await conn.query(
-    //       "INSERT INTO content_image(content_id, image) VALUES ?",
-    //       [imgArray]);
-    //   // }
+        // update img //
+        const [row3, field3] = await conn.query('SELECT count(*) num_img FROM content_image where content_id = ?;', [contentId])
+        var num_img = row3[0].num_img
+        console.log('num_img : ',num_img)
+    
+        // กรณีที่รูปเดิมใน db มัน < ที่แก้ไข
+        if (num_img < oldImgArray.length-1){
+          await conn.query('UPDATE post SET img=? WHERE post_id=?', 
+          [oldImgArray[0], req.params.id])
 
-    // }
-    // else if(files.length < 1){
-    //     await conn.query("DELETE FROM content_image WHERE content_id = ?", 
-    //     [contentId])
-    // }
+          for(let i=1; i<=num_img; i++){
+            await conn.query(
+              "UPDATE content_image SET image=? WHERE content_id=?",
+              [oldImgArray[i], contentId]);
+          }
+          for(let i=num_img; i<oldImgArray.length; i++){
+            await conn.query(
+              "INSERT INTO content_image(content_id, image) VALUES (?, ?)",
+              [contentId, oldImgArray[i]]);
+          }
+        }
+        // กรณีที่รูปเดิมใน db มัน > ที่แก้ไข
+        else if(num_img > oldImgArray.length-1){
+          await conn.query('UPDATE post SET img=? WHERE post_id=?', 
+          [oldImgArray[0], req.params.id])
+
+          await conn.query('DELETE FROM content_image WHERE content_id = ?', [contentId])
+          for(let i=1; i<oldImgArray.length; i++){
+            await conn.query(
+              "INSERT INTO content_image(content_id, image) VALUES (?, ?)",
+              [contentId, oldImgArray[i]]);
+          }
+        }
+        else if(num_img === oldImgArray.length-1){
+          await conn.query('UPDATE post SET img=? WHERE post_id=?', 
+          [oldImgArray[0], req.params.id])
+
+          await conn.query('DELETE FROM content_image WHERE content_id = ?', [contentId])
+          for(let i=1; i<oldImgArray.length; i++){
+            await conn.query(
+              "INSERT INTO content_image(content_id, image) VALUES (?, ?)",
+              [contentId, oldImgArray[i]]);
+          }
+        }
+    if (files.length > 0) {
+      if (oldImgArray.length > 0){
+        req.files.forEach((files, index) => {
+          let image = [files.path.substring(6), contentId]
+          imgArray.push(image)
+        })
+
+        await conn.query(
+          "INSERT INTO content_image(image, content_id) VALUES ?",
+          [imgArray]
+        );
+      }
+      else{
+        var main = files[0]
+        const [rows, fields] = await conn.query(
+            'UPDATE post SET img = ? WHERE post_id = ?',
+            [main.path.substring(6), req.params.id]
+        )
+
+        req.files.forEach((files, index) => {
+          if (index !== 0){
+            let image = [contentId, files.path.substring(6)]
+            imgArray.push(image)
+          }
+        })
+        // console.log('Img Array :', imgArray)
+
+        await conn.query(
+          "INSERT INTO content_img(content_id, image) VALUES ?",
+          [imgArray]
+        );
+
+      }
+
+
+    }
 
     
     

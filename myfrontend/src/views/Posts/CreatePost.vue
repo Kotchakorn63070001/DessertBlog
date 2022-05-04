@@ -2,12 +2,10 @@
     <div class="container is-widescreen">
         <div class="m-4">
             <div class="columns">
-                <div class="column is-2">
-
-                </div>
+                <div class="column is-2"></div>
                 <div class="column is-8">
                     <!-- <form action="/create/" method="POST" enctype="multipart/form-data"> -->
-                        <div class="box 	">
+                        <div class="box">
                             <div class="field">
                                 <label class="label">ชื่อเมนู</label>
                                 <div class="control">
@@ -169,7 +167,7 @@
 
                                 <div v-if="moreImages" class="columns is-multiline">
                                     <div v-for="(image, index) in moreImages" :key="image.id" class="column is-one-quarter">
-                                        <div class="card">
+                                        <div class="card" :class="{'has-background-danger-light': index === 0}">
                                             <div class="card-image">
                                                 <figure class="image is-4by3">
                                                     <img :src="showImage(image)" alt="Placeholder image">
@@ -225,8 +223,10 @@ export default{
             moreImages: [],
         }
     },
-    created(){
-        console.log(this.moreImages.length)
+    computed:{
+        sizeMoreImage(){
+            return this.moreImages.length
+        },
     },
     methods:{
         // selectMainImage(event){
@@ -274,7 +274,6 @@ export default{
             }
         },
         submitPost(){
-
             if(this.title === ''){
                 alert('กรุณาใส่ชื่อเมนู')
             }

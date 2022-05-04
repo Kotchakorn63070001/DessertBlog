@@ -16,7 +16,7 @@
 
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-end">
-      
+
       <a class="navbar-item" href="/">
         <span class="icon-text">
           <span class="icon">
@@ -53,15 +53,25 @@
               <span>Profile</span>
             </router-link>
           </a>
+          <hr class="navbar-divider">
           <a class="navbar-item">
             Log out
           </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item">
-            Report an issue
-          </a>
         </div>
       </div>
+
+      <!-- <div class="navbar-end">
+        <div class="navbar-item" >
+          <div class="buttons">
+            <a class="button is-primary">
+              <router-link to="/user/login" class="has-text-white">
+                <strong>login</strong>
+              </router-link>
+            </a>
+          </div>
+        </div>
+      </div> -->
+
     </div>
 
     

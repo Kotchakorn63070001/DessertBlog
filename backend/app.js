@@ -17,11 +17,11 @@ app.use(bodyParser.urlencoded({ extended: false}))
 // routers
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/posts')
-// const commentRouter = require('./routes/comment')
+const commentRouter = require('./routes/comments')
 
 app.use(indexRouter.router)
 app.use(postRouter.router)
-// app.use(commentRouter.router)
+app.use(commentRouter.router)
 
 
 

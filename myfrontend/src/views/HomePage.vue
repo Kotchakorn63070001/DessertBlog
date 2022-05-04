@@ -79,15 +79,7 @@
                       <span>Read More</span>
                     </router-link>
                   </a>
-
-
-                
                 </div>
-
-
-
-
-               
               </div>
             </div>
           </div>
@@ -145,7 +137,7 @@ export default {
           .then((response) => {
             let selectedPost = this.posts.filter(e => e.id === postId)[0]
             selectedPost.num_like = response.data.like
-            this.$router.push("/")
+            this.$router.push('/')
           })
           .catch((err) => {
             console.log(err);
