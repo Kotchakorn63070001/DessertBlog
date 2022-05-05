@@ -93,7 +93,9 @@ export default{
                     .put(`http://localhost:3000/status/${reportId}`, {
                         status: this.status,
                     })
-                    .then(() => {
+                    .then((response) => {
+                        let selectReport = this.reports.filter(e => e.report_id === this.idReportChange)[0]
+                        selectReport.status = response.data.status
                         this.status = 0
                         this.showChangeStatus = false
                         this.$router.push('/reports')

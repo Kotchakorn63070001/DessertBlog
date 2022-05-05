@@ -29,18 +29,24 @@ router.put("/status/:reportId", async function (req, res) {
   
     try {
 
-        if (status === 1){
+        if (status === '1'){
+            console.log('เข้า 1')
             await conn.query('UPDATE report SET status=? WHERE report_id=?', 
             ['pending', req.params.reportId])
         }
-        else if (status === 2){
+        else if (status === '2'){
+            console.log('เข้า 2')
             await conn.query('UPDATE report SET status=? WHERE report_id=?', 
             ['complete', req.params.reportId])
         }
         
+        const [rows, fields] = await conn.query("SELECT * FROM report WHERE report_id=?",
+                                [req.params.reportId])
+                                // console.log(rows[0].status)
 
         conn.commit()
-        res.json({ message: "Update status report id " + req.params.reportId + " Complete" })
+        res.json({ status: rows[0].status})
+        // res.json({ message: "Update status report id " + req.params.reportId + " Complete" })
     } catch (error) {
         console.log(error)
         await conn.rollback()
