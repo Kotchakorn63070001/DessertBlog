@@ -42,7 +42,7 @@
                         <a class="dropdown-item" v-if="isPostOwner(post) || isAdmin()" @click="deletePost(post)" >
                              <span>Delete</span>
                         </a>
-                        <a class="dropdown-item" @click="addReport(post.post_id)">
+                        <a class="dropdown-item" v-if="!isPostOwner(post) && !isAdmin()" @click="addReport(post.post_id)">
                             <span>Report</span>
                         </a>
                       </div>
