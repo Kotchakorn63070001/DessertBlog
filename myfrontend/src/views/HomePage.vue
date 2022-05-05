@@ -39,7 +39,7 @@
                         <a class="dropdown-item" v-if="isPostOwner(post)" @click="$router.push({name:'edit-post', params:{id: post.post_id}})">
                           <span>Edit</span>
                         </a>
-                        <a class="dropdown-item" v-if="isPostOwner(post) || isAdmin()" @click="deletePost(post)" @click="deletePost(post)">
+                        <a class="dropdown-item" v-if="isPostOwner(post) || isAdmin()" @click="deletePost(post)" >
                              <span>Delete</span>
                         </a>
                         <a class="dropdown-item" @click="addReport(post.post_id)">
