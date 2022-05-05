@@ -179,7 +179,7 @@ export default {
         }
       },
       addReport(postId){
-        this.$router.push({name: 'create-report', params: { postId: postId}})
+        this.$router.push({name: 'create-report-post', params: { postId: postId }})
       },
       
     }

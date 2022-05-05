@@ -76,7 +76,7 @@
                                                     <a class="dropdown-item" @click="deleteComment(comment.comment_id, index)">
                                                         <span>Delete</span>
                                                     </a>
-                                                    <a href="#" class="dropdown-item">
+                                                    <a class="dropdown-item" @click="addReport(comment.comment_id)">
                                                     <span>Report</span>
                                                     </a>
                                                 </div>
@@ -191,6 +191,9 @@ export default{
                 .catch((err) => {
                     console.log(err)
                 });
+        },
+        addReport(commentId){
+            this.$router.push({name: 'create-report-comment', params: { commentId: commentId }})
         }
         
     }

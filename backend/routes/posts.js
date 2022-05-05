@@ -61,10 +61,27 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
         let contentId = rows1.insertId;
         console.log('content_id = ', contentId)
 
-        req.body.ingredient.forEach((item) => {
-          let ingre = [contentId, item];
-          ingreArray.push(ingre);
-        });
+
+        // console.log(req.body.ingredient)
+        // console.log('length : ', req.body.ingredient.length)
+        // if (req.body.ingredient.length > 1){
+          req.body.ingredient.forEach((item) => {
+            let ingre = [contentId, item];
+            ingreArray.push(ingre);
+          });
+
+          await conn.query(
+            "INSERT INTO content_ingredient(content_id, ingredient) VALUES ?",
+            [ingreArray]
+          );
+        // }
+        // else{
+          // await conn.query(
+          //   "INSERT INTO content_ingredient(content_id, ingredient) VALUES ?",
+          //   [req.body.ingredient, contentId]
+          // )
+        // }
+
         // console.log('Ingredient Array :', ingreArray)
 
         req.body.methodCook.forEach((item) => {
@@ -72,6 +89,10 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
           methodArray.push(method)
         })
 
+        console.log(files)
+        console.log('type of file : ',Array.isArray(files))
+
+        // if (files.length > 0)
         req.files.forEach((files, index) => {
           if (index !== 0){
             let image = [contentId, files.path.substring(6)]
@@ -80,10 +101,7 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
         })
         // console.log('Img Array :', imgArray)
 
-        await conn.query(
-          "INSERT INTO content_ingredient(content_id, ingredient) VALUES ?",
-          [ingreArray]
-        );
+
 
         await conn.query(
           "INSERT INTO content_cooking_method(content_id, cooking_method) VALUES ?",
@@ -218,7 +236,6 @@ router.put("/posts/update/:id", upload.array("newImage"),async function (req, re
   console.log('title : ', title)
   const description = req.body.description;
   console.log('description: ', description)
-  // const file = req.file;
   const postTypeId = req.body.typeDessert;
   console.log('post_type_id : ',postTypeId)
   const files = req.files;
@@ -345,7 +362,7 @@ router.put("/posts/update/:id", upload.array("newImage"),async function (req, re
       }
     }
 
-        // update img //
+        //// update img ////
         const [row3, field3] = await conn.query('SELECT count(*) num_img FROM content_image where content_id = ?;', [contentId])
         var num_img = row3[0].num_img
         console.log('num_img : ',num_img)
@@ -389,6 +406,9 @@ router.put("/posts/update/:id", upload.array("newImage"),async function (req, re
               [contentId, oldImgArray[i]]);
           }
         }
+
+
+    /// check file length ///    
     if (files.length > 0) {
       if (oldImgArray.length > 0){
         req.files.forEach((files, index) => {

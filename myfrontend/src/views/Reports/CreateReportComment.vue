@@ -21,7 +21,7 @@
 
                             <div class="field is-grouped">
                                 <div class="control">
-                                    <button class="button is-primary" @click="submitReportPost">submit</button>
+                                    <button class="button is-primary" @click="submitReportComment">submit</button>
                                 </div>
                                 <div class="control">
                                     <router-link to="/home">
@@ -49,9 +49,9 @@ export default{
         }
     },
     methods:{
-       submitReportPost(){
+       submitReportComment(){
            axios
-            .post(`http://localhost:3000/create/report/post/${this.$route.params.postId}`, {
+            .post(`http://localhost:3000/create/report/comment/${this.$route.params.commentId}`, {
                 titleReport: this.titleReport,
                 textReport: this.textReport,
             })

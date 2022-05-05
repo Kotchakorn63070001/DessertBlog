@@ -31,14 +31,19 @@ const routes = [
     component: () => import('../views/ProfilePage.vue')
   },
   {
-    path: '/report',
+    path: '/reports',
     name: 'report',
     component: () => import('../views/Reports/ReportPage.vue')
   },
   {
     path: '/create/report/:postId',
-    name: 'create-report',
+    name: 'create-report-post',
     component: () => import('../views/Reports/CreateReportPost.vue')
+  },
+  {
+    path: '/create/report/:commentId',
+    name: 'create-report-comment',
+    component: () => import('../views/Reports/CreateReportComment.vue')
   }
 ]
 

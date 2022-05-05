@@ -38,13 +38,8 @@
       </a>
 
       <a class="navbar-item" >
-        <router-link to="#" class="has-text-white">
-          <span class="icon-text">
-            <span class="icon">
-              <i class="fa-solid fa-pen"></i>
-            </span>
+        <router-link to="/reports" class="has-text-white">
             <span>Report</span>
-          </span>
         </router-link>
       </a>
 
