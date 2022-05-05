@@ -13,9 +13,9 @@
                             </figure>
                             <div class="media-content mt-4">
                                 <div class="content">
-                                    <h4>ชื่อผู้ใช้</h4>
-                                    <h5>@username</h5>
-                                    <p>email : </p>
+                                    <h4>Name     : {{user.name}}</h4>
+                                    <h5>Username : {{user.username}}</h5>
+                                    <p>Email     : {{user.email}} </p>
                                 </div>
                             </div>
                             <div class="media-right">
@@ -35,3 +35,8 @@
         </div>
     </div>
 </template>
+<script>
+export default{
+    props: ['user']
+}
+</script>
