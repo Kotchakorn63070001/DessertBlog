@@ -11,9 +11,9 @@ const postOwner = async (req, res, next) => {
     return next()
   }
   
-  const [[post]] = await pool.query('SELECT * FROM post WHERE user_id=?', [req.params.id])
+  const [[post]] = await pool.query('SELECT * FROM post WHERE post_id=?', [req.params.postId])
 
-  if (post.user_id !== req.user.id) {
+  if (post.user_id !== req.user.user_id) {
     return res.status(403).send('You do not have permission to perform this action')
   }
 
@@ -67,7 +67,7 @@ router.post('/create', isLoggedIn, upload.array("moreImages"), async function(re
 
         const [rows, fields] = await conn.query(
             'INSERT INTO post(title, date, img, description, user_id, post_type_id) VALUES(?, CURRENT_TIMESTAMP, ?, ? ,?, ?)',
-            [title, main.path.substring(6), description, 1, postTypeId]
+            [title, main.path.substring(6), description,  req.user.user_id, postTypeId]
         )
         let postId = rows.insertId;
 
