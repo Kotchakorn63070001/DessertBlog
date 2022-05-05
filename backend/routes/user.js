@@ -30,21 +30,29 @@ const passwordValidator = (value, helpers) => {
     }
     return value
 }
-
+// check username
 const usernameValidator = async (value, helpers) => {
     const [rows, _] = await pool.query("SELECT username FROM user WHERE username = ?", [value])
     if (rows.length > 0) {
-        const message = 'This username is already taken'
+        const message = 'username นี้ถูกให้ไปแล้ว กรุณาเปลี่ยนใหม่'
         throw new Joi.ValidationError(message, { message })
     }
     return value
 }
-
+// check email
+const emailValidator = async (value, helpers) => {
+    const [rows1, _] = await pool.query("SELECT email FROM user WHERE email = ?", [value])
+    if (rows1.length > 0) {
+        const message = 'email นี้ถูกให้ไปแล้ว กรุณาเปลี่ยนใหม่'
+        throw new Joi.ValidationError(message, { message })
+    }
+    return value
+}
 const signupSchema = Joi.object({
-    email: Joi.string().required().email(),
     name: Joi.string().required().max(200),
     password: Joi.string().required().custom(passwordValidator),
     username: Joi.string().required().min(5).max(20).external(usernameValidator),
+    email: Joi.string().required().email().external(emailValidator),
 })
 
 router.post('/user/register', async (req, res, next) => {
