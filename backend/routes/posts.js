@@ -4,6 +4,23 @@ const path = require("path")
 const pool = require("../config");
 const fs = require("fs");
 
+const { isLoggedIn } = require('../middlewares')
+
+const postOwner = async (req, res, next) => {
+  if (req.user.role === 'admin') {
+    return next()
+  }
+  
+  const [[post]] = await pool.query('SELECT * FROM post WHERE user_id=?', [req.params.id])
+
+  if (post.user_id !== req.user.id) {
+    return res.status(403).send('You do not have permission to perform this action')
+  }
+
+  next()
+}
+
+
 // SET STORAGE
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -27,7 +44,7 @@ router = express.Router();
 //     // res.send('Hello World!')
 // })
 
-router.post('/create',  upload.array("moreImages"), async function(req, res, next){
+router.post('/create', isLoggedIn, upload.array("moreImages"), async function(req, res, next){
     
     const title = req.body.title;
     const description = req.body.description;
@@ -127,7 +144,7 @@ router.post('/create',  upload.array("moreImages"), async function(req, res, nex
 
 
 // เพิ่มยอดไลค์
-router.put("/posts/addlike/:postId", async function (req, res, next) {
+router.put("/posts/addlike/:postId", isLoggedIn, async function (req, res, next) {
     const conn = await pool.getConnection();
     await conn.beginTransaction();
 
@@ -155,7 +172,7 @@ router.put("/posts/addlike/:postId", async function (req, res, next) {
     }
 });
   
-router.get("/posts/:id", function (req, res, next) {
+router.get("/posts/:id",isLoggedIn, function (req, res, next) {
     const promise1 = pool.query("SELECT * FROM post JOIN content USING (post_id) WHERE post_id=?", [
       req.params.id,
     ]);
@@ -203,7 +220,7 @@ router.get("/posts/:id", function (req, res, next) {
 });
 
 // เพิ่มยอดวิว
-router.put("/posts/addview/:postId", async function(req, res, next){
+router.put("/posts/addview/:postId", isLoggedIn,async function(req, res, next){
   const conn = await pool.getConnection();
   await conn.beginTransaction();
 
@@ -230,7 +247,7 @@ router.put("/posts/addview/:postId", async function(req, res, next){
 })
 
 // Edit Post
-router.put("/posts/update/:id", upload.array("newImage"),async function (req, res) {
+router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),async function (req, res) {
   
   const title = req.body.title;
   console.log('title : ', title)
@@ -456,7 +473,7 @@ router.put("/posts/update/:id", upload.array("newImage"),async function (req, re
 
 
 //  Delete Post
-router.delete("/posts/:postId", async function (req, res, next) {
+router.delete("/posts/:postId",isLoggedIn,postOwner, async function (req, res, next) {
   // Your code here
   const conn = await pool.getConnection();
   await conn.beginTransaction();

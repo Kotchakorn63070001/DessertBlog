@@ -36,10 +36,10 @@
                     </div>
                     <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
                       <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
-                        <a class="dropdown-item" @click="$router.push({name:'edit-post', params:{id: post.post_id}})">
+                        <a class="dropdown-item" v-if="isPostOwner(post)" @click="$router.push({name:'edit-post', params:{id: post.post_id}})">
                           <span>Edit</span>
                         </a>
-                        <a class="dropdown-item" @click="deletePost(post)">
+                        <a class="dropdown-item" v-if="isPostOwner(post) || isAdmin()" @click="deletePost(post)" >
                              <span>Delete</span>
                         </a>
                         <a class="dropdown-item" @click="addReport(post.post_id)">
@@ -88,9 +88,12 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
+import axios from '@/plugins/axios'
 
 export default {
+props: ['user','admin'],
+
     data() {
       return {
         search: '',
@@ -181,7 +184,14 @@ export default {
       addReport(postId){
         this.$router.push({name: 'create-report-post', params: { postId: postId }})
       },
-      
+      isPostOwner (post) {
+      if (!this.user) return false
+      return post.user_id === this.user.user_id
+    },
+      isAdmin() {
+      if (!this.user) return false
+      return this.user.role === 'admin'
+    },
     }
   }
 </script>
