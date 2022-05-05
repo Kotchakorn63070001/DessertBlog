@@ -76,7 +76,7 @@
         <div class="navbar-item"  v-if="!user">
           <div class="buttons">
             <a class="button is-primary">
-              <router-link to="#" class="has-text-white">
+              <router-link to="/user/login" class="has-text-white">
                 <strong>login</strong>
               </router-link>
             </a>
