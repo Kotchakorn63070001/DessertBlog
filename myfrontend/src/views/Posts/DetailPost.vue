@@ -73,10 +73,10 @@
                                                 </div>
                                                 <div class="dropdown-menu" id="dropdown-menu3" role="menu" style="min-width: 5em">
                                                 <div class="dropdown-content" style="padding-top: 0.2rem; padding-bottom: 0.2rem">
-                                                    <a class="dropdown-item" @click="deleteComment(comment.comment_id, index)">
+                                                    <a class="dropdown-item"  v-if="isAdmin()|| isCommentOwner(comment)" @click="deleteComment(comment.comment_id, index)">
                                                         <span>Delete</span>
                                                     </a>
-                                                    <a class="dropdown-item" @click="addReport(comment.comment_id)">
+                                                    <a class="dropdown-item" v-if="!isAdmin() && !isCommentOwner(comment)" @click="addReport(comment.comment_id)">
                                                     <span>Report</span>
                                                     </a>
                                                 </div>
@@ -94,7 +94,7 @@
                                     </figure>
                                     <div class="media-content">
                                         <div class="field">
-                                            <p class="is-size-6"><strong>@username</strong></p>
+                                            <p class="is-size-6"><strong>@{{user.username}}</strong></p>
                                             <p class="control">
                                                 <input type="text" class="input" v-model="newComment" placeholder="Add a comment..." />
                                             </p>
@@ -195,7 +195,19 @@ export default{
         },
         addReport(commentId){
             this.$router.push({name: 'create-report-comment', params: { commentId: commentId }})
-        }
+        },
+         isPostOwner (post) {
+                    if (!this.user) return false
+                    return post.user_id === this.user.user_id
+                },
+                isCommentOwner(comment){
+                    if (!this.user) return false
+                    return comment.user_id === this.user.user_id
+                },
+                isAdmin() {
+                    if (!this.user) return false
+                 return this.user.role === 'admin'
+                },
         
     }
    
