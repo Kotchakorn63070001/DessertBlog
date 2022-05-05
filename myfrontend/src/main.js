@@ -5,9 +5,9 @@ import 'bulma/css/bulma.css'
 
 
 
+import Vuelidate from 'vuelidate'
 
-
-
+Vue.use(Vuelidate)
 
 Vue.config.productionTip = false
 
