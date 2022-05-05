@@ -7,8 +7,23 @@ const pool = require("../config");
 const router = express.Router();
 
 
+const { isLoggedIn } = require('../middlewares')
+
+const commentOwner = async (req, res, next) => {
+    if (req.user.role === 'admin') {
+        return next()
+      }
+    
+    const [[comment]] = await pool.query('SELECT * FROM comment WHERE comment_id=?', [req.params.commentId])
+    if (comment.user_id !== req.user.user_id) {
+      return res.status(403).send('You do not have permission to perform this action')
+    }
+  
+    next()
+}
+
 // Get comment
-router.get('/:id/comments', function(req, res, next){
+router.get('/:id/comments',isLoggedIn, function(req, res, next){
     const promise1 = pool.query("SELECT * FROM comment WHERE post_id = ?", [
         req.params.id,
     ]);
@@ -28,7 +43,7 @@ router.get('/:id/comments', function(req, res, next){
 });
 
 // Create new comment
-router.post('/:id/comments', async function(req, res, next){
+router.post('/:id/comments',isLoggedIn, async function(req, res, next){
     // id -> postId
     // console.log(req.body)
     const comment = req.body.comment;
@@ -40,8 +55,8 @@ router.post('/:id/comments', async function(req, res, next){
 
     try{
         const [row, field] = await conn.query(
-            'INSERT INTO comment(comment_text, user_id, post_id) VALUES(?, 1, ?)',
-            [comment, req.params.id]
+            'INSERT INTO comment(comment_text, user_id, post_id) VALUES(?, ?, ?)',
+            [comment,req.user.user_id,req.params.id]
         );
 
         let commentId = row.insertId
@@ -64,7 +79,7 @@ router.post('/:id/comments', async function(req, res, next){
 
 
 // Delete comment
-router.delete('/comments/:commentId', async function(req, res, next){
+router.delete('/comments/:commentId',isLoggedIn,commentOwner, async function(req, res, next){
     const conn = await pool.getConnection();
     await conn.beginTransaction();
     try{
