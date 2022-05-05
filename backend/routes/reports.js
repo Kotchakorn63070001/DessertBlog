@@ -1,6 +1,8 @@
 const express = require("express");
 const pool = require("../config");
 const router = express.Router();
+const { isLoggedIn } = require('../middlewares')
+
 
 router.get('/reports', function(req, res, next){
     const promise1 = pool.query("SELECT * FROM report JOIN user USING (user_id)");
@@ -19,7 +21,7 @@ router.get('/reports', function(req, res, next){
         });
 })
 
-router.put("/status/:reportId", async function (req, res) {
+router.put("/status/:reportId",  isLoggedIn, async function (req, res) {
 
     console.log('มาน้า')
     const status = req.body.status
@@ -57,11 +59,12 @@ router.put("/status/:reportId", async function (req, res) {
 });
 
 // Create new report post
-router.post('/create/report/post/:postId', async function(req, res, next){
+router.post('/create/report/post/:postId', isLoggedIn, async function(req, res, next){
     const titleReport = req.body.titleReport;
     console.log('title post : ', titleReport)
     const textReport = req.body.textReport;
     console.log('text post : ', textReport)
+    console.log(req.user)
 
     const conn = await pool.getConnection()
     await conn.beginTransaction()
@@ -71,7 +74,7 @@ router.post('/create/report/post/:postId', async function(req, res, next){
     try{
         const [row, field] = await conn.query(
             'INSERT INTO report(report_title, report_text, status, user_id, post_id) VALUES(?, ?, ?, ?, ?)',
-            [titleReport, textReport, 'pending', 1, req.params.postId]
+            [titleReport, textReport, 'pending', req.user.user_id, req.params.postId]
         );
 
         let reportId = row.insertId
@@ -93,7 +96,7 @@ router.post('/create/report/post/:postId', async function(req, res, next){
 });
 
 // Create new report comment
-router.post('/create/report/comment/:commentId', async function(req, res, next){
+router.post('/create/report/comment/:commentId', isLoggedIn, async function(req, res, next){
     const titleReport = req.body.titleReport;
     console.log('title comment : ', titleReport)
     const textReport = req.body.textReport;
@@ -107,7 +110,7 @@ router.post('/create/report/comment/:commentId', async function(req, res, next){
     try{
         const [row, field] = await conn.query(
             'INSERT INTO report(report_title, report_text, status, user_id, comment_id) VALUES(?, ?, ?, ?, ?)',
-            [titleReport, textReport, 'pending', 1, req.params.commentId]
+            [titleReport, textReport, 'pending', req.user.user_id, req.params.commentId]
         );
 
         let reportId = row.insertId
