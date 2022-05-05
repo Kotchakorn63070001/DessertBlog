@@ -128,6 +128,7 @@
 import axios from '@/plugins/axios'
 
 export default{
+    props: ['user'],
     data(){
         return{
             post: {},
@@ -175,6 +176,7 @@ export default{
                     .then((response) => {
                         this.newComment = ''
                         this.comments.push(response.data)
+                        this.$router.push({name: 'detail-post'})
                     })
                     .catch((err) => {
                         console.log(err)
@@ -187,7 +189,7 @@ export default{
                 .then((response) => {
                     console.log(response);
                     this.comments.splice(index, 1);
-                    this.$router.push(`/posts/${this.$route.params.id}`)
+                    // this.$router.push(`/posts/${this.$route.params.id}`)
                 })
                 .catch((err) => {
                     console.log(err)

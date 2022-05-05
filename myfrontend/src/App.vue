@@ -48,8 +48,8 @@
           <!-- <span class="icon">
             <i class="fa-solid fa-user"></i>
           </span> -->
-          <figure class="image is-24x24 my-auto">
-            <img class="is-rounded" src="https://bulma.io/images/placeholders/128x128.png">
+          <figure class="image is-32x32 my-auto">
+            <img style="border-radius: 50%;width: 32px; height: 32px; overflow: hidden;" :src="imagePath(user.user_img)">
           </figure>
           <span class="pl-3">{{ user.username }}</span>
         </a>
@@ -119,6 +119,14 @@ export default {
     isAdmin() {
       if (!this.user) return false
       return this.user.role === 'admin'
+    },
+    imagePath(file_path) {
+      if (file_path){
+        return 'http://localhost:3000/' + file_path
+      } 
+      else {
+        return 'https://bulma.io/images/placeholders/128x128.png'
+      }
     },
   },
 }

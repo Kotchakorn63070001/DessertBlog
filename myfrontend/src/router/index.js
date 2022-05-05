@@ -54,6 +54,12 @@ const routes = [
     component: () => import('../views/ProfilePage.vue')
   },
   {
+    path: '/profile/:userId',
+    name: 'edit-profile',
+    meta: { login: true },
+    component: () => import('../views/EditProfile.vue')
+  },
+  {
     path: '/reports',
     name: 'report',
     meta: { login: true },

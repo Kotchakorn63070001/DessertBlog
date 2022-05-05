@@ -7,9 +7,9 @@
                     <div class="box">
                         <article class="media">
                             <figure class="media-left">
-                                <p class="image is-128x128">
-                                    <img class="is-rounded" src="https://bulma.io/images/placeholders/128x128.png">
-                                </p>
+                                <figure class="image is-128x128">
+                                    <img style="border-radius: 50%;width: 128px; height: 128px; overflow: hidden;" :src="imagePath(user.user_img)">
+                                </figure>
                             </figure>
                             <div class="media-content mt-4">
                                 <div class="content">
@@ -21,7 +21,8 @@
                             <div class="media-right">
                                 <a>
                                     <!-- <router-link to="/create" class="has-text-white"> -->
-                                        <span class="icon">
+                                     <span class="icon" @click="editProfile(user.user_id)">
+                                        <!-- <span class="icon" @click="editProfile === true"> -->
                                             <i class="fa-solid fa-marker"></i>
                                         </span>
                                     <!-- </router-link> -->
@@ -36,7 +37,29 @@
     </div>
 </template>
 <script>
+// import axios from 'axios'
 export default{
-    props: ['user']
+    props: ['user'],
+    data(){
+        // return{
+        //     editProfile: false,
+        // }
+       
+    },
+
+        
+    methods: {
+        editProfile(userId){
+            this.$router.push({name: 'edit-profile', params: {userId: userId}})
+        },
+        imagePath(file_path) {
+            if (file_path){
+            return 'http://localhost:3000/' + file_path
+            } 
+            else {
+            return 'https://bulma.io/images/placeholders/128x128.png'
+            }
+        },
+    }
 }
 </script>

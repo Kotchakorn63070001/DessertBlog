@@ -4,6 +4,23 @@ const Joi = require('joi')
 const bcrypt = require('bcrypt');
 const { generateToken } = require("../utils/token");
 const { isLoggedIn } = require('../middlewares')
+const multer = require("multer");
+const path = require("path")
+
+
+// SET STORAGE
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+      callback(null, "./static/uploads");
+    },
+    filename: function (req, file, callback) {
+      callback(
+        null,
+        file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+      );
+    },
+  });
+  const upload = multer({ storage: storage });
 
 router = express.Router();
 
@@ -123,6 +140,40 @@ router.get('/user/me', isLoggedIn, async (req, res, next) => {
     // req.user ถูก save ข้อมูล user จาก database ใน middleware function "isLoggedIn"
     res.json(req.user)
 })
+
+router.put('/user/update/:userId', isLoggedIn, upload.single("image"), async (req, res, next) => {
+    // const name = req.body.name
+    // const username = req.body.username
+    // const email = req.body.email
+    const file = req.file
+    // console.log(name)
+
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    try {
+
+        await conn.query('UPDATE user SET user_img=? WHERE user_id=?', 
+        [file.path.substring(6), req.params.userId])
+
+        const [row, field] = await conn.query(
+            'SELECT * FROM user WHERE user_id=?',
+            [req.params.userId]
+        )
+
+        // console.log(row[0].name)
+        conn.commit()
+        res.json({user_img: row[0].user_img})
+        res.status(201).send()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        console.log('finally edit profile')
+        conn.release()
+    }
+})
+
+
 
 
 exports.router = router
