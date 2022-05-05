@@ -247,7 +247,7 @@ router.put("/posts/addview/:postId", isLoggedIn,async function(req, res, next){
 })
 
 // Edit Post
-router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),async function (req, res) {
+router.put("/posts/update/:postId",isLoggedIn,postOwner, upload.array("newImage"),async function (req, res) {
   
   const title = req.body.title;
   console.log('title : ', title)
@@ -274,9 +274,9 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
   try {
 
       await conn.query('UPDATE post SET title=?,  description=?, post_type_id=? WHERE post_id=?', 
-      [title,  description, postTypeId, req.params.id])
+      [title,  description, postTypeId, req.params.postId])
 
-      const [row, field] = await conn.query('SELECT * FROM content WHERE post_id=?', [req.params.id])
+      const [row, field] = await conn.query('SELECT * FROM content WHERE post_id=?', [req.params.postId])
       var contentId = row[0].content_id
     // console.log(contentId)
 
@@ -387,7 +387,7 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
         // กรณีที่รูปเดิมใน db มัน < ที่แก้ไข
         if (num_img < oldImgArray.length-1){
           await conn.query('UPDATE post SET img=? WHERE post_id=?', 
-          [oldImgArray[0], req.params.id])
+          [oldImgArray[0], req.params.postId])
 
           for(let i=1; i<=num_img; i++){
             await conn.query(
@@ -403,7 +403,7 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
         // กรณีที่รูปเดิมใน db มัน > ที่แก้ไข
         else if(num_img > oldImgArray.length-1){
           await conn.query('UPDATE post SET img=? WHERE post_id=?', 
-          [oldImgArray[0], req.params.id])
+          [oldImgArray[0], req.params.postId])
 
           await conn.query('DELETE FROM content_image WHERE content_id = ?', [contentId])
           for(let i=1; i<oldImgArray.length; i++){
@@ -414,7 +414,7 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
         }
         else if(num_img === oldImgArray.length-1){
           await conn.query('UPDATE post SET img=? WHERE post_id=?', 
-          [oldImgArray[0], req.params.id])
+          [oldImgArray[0], req.params.postId])
 
           await conn.query('DELETE FROM content_image WHERE content_id = ?', [contentId])
           for(let i=1; i<oldImgArray.length; i++){
@@ -442,7 +442,7 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
         var main = files[0]
         const [rows, fields] = await conn.query(
             'UPDATE post SET img = ? WHERE post_id = ?',
-            [main.path.substring(6), req.params.id]
+            [main.path.substring(6), req.params.postId]
         )
 
         req.files.forEach((files, index) => {
@@ -461,7 +461,7 @@ router.put("/posts/update/:id",isLoggedIn,postOwner, upload.array("newImage"),as
     }
     
       conn.commit()
-      res.json({ message: "Update Post id " + req.params.id + " Complete" })
+      res.json({ message: "Update Post id " + req.params.postId + " Complete" })
   } catch (error) {
       console.log(error)
       await conn.rollback()
