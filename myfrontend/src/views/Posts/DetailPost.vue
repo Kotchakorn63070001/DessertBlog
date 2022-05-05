@@ -58,7 +58,7 @@
                                     <div class="media-content">
                                         <div class="content">
                                             <!-- <input v-model="editCommentText" class="input" type="text" /> -->
-                                            <p class="is-size-6"><strong>@username</strong></p>
+                                            <p class="is-size-6"><strong>@{{ comment.username }}</strong></p>
                                             <p class="is-size-6">{{ comment.comment_text }}</p>
                                         </div>
                                     </div>

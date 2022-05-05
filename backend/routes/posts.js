@@ -185,7 +185,7 @@ router.get("/posts/:id",isLoggedIn, function (req, res, next) {
     const promise4 = pool.query("SELECT image FROM content JOIN content_image USING (content_id) WHERE post_id=?", [
       req.params.id,
     ]);
-    const promise5 = pool.query("SELECT * FROM comment WHERE post_id=?", [
+    const promise5 = pool.query("SELECT * FROM comment JOIN user USING (user_id) WHERE post_id=?", [
       req.params.id,
     ]);
 
