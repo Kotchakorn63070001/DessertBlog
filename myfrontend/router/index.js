@@ -53,6 +53,24 @@ const routes = [
     name: 'profile',
     meta: { login: true },
     component: () => import('../views/ProfilePage.vue')
+  },
+  {
+    path: '/reports',
+    name: 'report',
+    meta: { login: true },
+    component: () => import('../views/Reports/ReportPage.vue')
+  },
+  {
+    path: '/create/report/:postId',
+    name: 'create-report-post',
+    meta: { login: true },
+    component: () => import('../views/Reports/CreateReportPost.vue')
+  },
+  {
+    path: '/create/report/:commentId',
+    name: 'create-report-comment',
+    meta: { login: true },
+    component: () => import('../views/Reports/CreateReportComment.vue')
   }
 ]
 
