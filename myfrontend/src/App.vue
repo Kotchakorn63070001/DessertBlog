@@ -26,7 +26,7 @@
         </span>
       </a>
 
-      <a class="navbar-item" v-if="user" >
+      <a class="navbar-item" v-if="user&& !isAdmin()" >
         <router-link to="/create" class="has-text-white">
           <span class="icon-text">
             <span class="icon">
@@ -37,7 +37,7 @@
         </router-link>
       </a>
 
-      <a class="navbar-item" >
+      <a class="navbar-item" v-if="user && isAdmin()">
         <router-link to="/reports" class="has-text-white">
             <span>Report</span>
         </router-link>
@@ -115,6 +115,10 @@ export default {
       axios.get('/user/me').then(res => {
         this.user = res.data
       })
+    },
+    isAdmin() {
+      if (!this.user) return false
+      return this.user.role === 'admin'
     },
   },
 }
