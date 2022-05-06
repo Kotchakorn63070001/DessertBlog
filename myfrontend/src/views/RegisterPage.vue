@@ -44,7 +44,10 @@
                 กรุณาใส่ username
               </p>
               <p class="help is-danger" v-if="!$v.username.minLength">
-                อย่างตัว5ตัวอักษรแต่ไม่เกิน20ตัวอักษร
+                อย่างตัว 5 ตัวอักษร
+              </p>
+              <p class="help is-danger" v-if="!$v.username.maxLength">
+                ไม่เกิน 20 ตัวอักษร
               </p>
             </template>
               </div>
